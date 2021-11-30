@@ -1,12 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-const { WaterfallDialog } = require('botbuilder-dialogs');
-const { CancelAndHelpDialog } = require('./cancelAndHelpDialog');
+const { WaterfallDialog, ComponentDialog } = require('botbuilder-dialogs');
 
 const WATERFALL_DIALOG = 'waterfallDialog';
 
-class StatusChamado extends CancelAndHelpDialog {
+class StatusChamado extends ComponentDialog {
     constructor(id) {
         super(id || 'statusChamado');
         this.addDialog(new WaterfallDialog(WATERFALL_DIALOG, [

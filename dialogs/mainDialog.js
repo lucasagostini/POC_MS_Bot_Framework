@@ -83,28 +83,29 @@ class MainDialog extends ComponentDialog {
         const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
         switch (LuisRecognizer.topIntent(luisResult)) {
         case 'TrocaPagamento': {
-            // Extract the values for the composite entities from the LUIS result.
-            const fromEntities = this.luisRecognizer.getFromEntities(luisResult);
-            const toEntities = this.luisRecognizer.getToEntities(luisResult);
+            // // Extract the values for the composite entities from the LUIS result.
+            // const fromEntities = this.luisRecognizer.getFromEntities(luisResult);
+            // const toEntities = this.luisRecognizer.getToEntities(luisResult);
 
-            // Show a warning for Origin and Destination if we can't resolve them.
-            await this.showWarningForUnsupportedCities(stepContext.context, fromEntities, toEntities);
+            // // Show a warning for Origin and Destination if we can't resolve them.
+            // await this.showWarningForUnsupportedCities(stepContext.context, fromEntities, toEntities);
 
-            // Initialize BookingDetails with any entities we may have found in the response.
-            bookingDetails.destination = toEntities.airport;
-            bookingDetails.origin = fromEntities.airport;
-            bookingDetails.travelDate = this.luisRecognizer.getTravelDate(luisResult);
-            console.log('LUIS extracted these booking details:', JSON.stringify(bookingDetails));
+            // // Initialize BookingDetails with any entities we may have found in the response.
+            // bookingDetails.destination = toEntities.airport;
+            // bookingDetails.origin = fromEntities.airport;
+            // bookingDetails.travelDate = this.luisRecognizer.getTravelDate(luisResult);
+            // console.log('LUIS extracted these booking details:', JSON.stringify(bookingDetails));
 
-            // Run the BookingDialog passing in whatever details we have from the LUIS call, it will fill out the remainder.
-            return await stepContext.beginDialog('bookingDialog', bookingDetails);
+            // // Run the BookingDialog passing in whatever details we have from the LUIS call, it will fill out the remainder.
+            // return await stepContext.beginDialog('bookingDialog', bookingDetails);
+            break;
         }
 
         case 'StatusChamado': {
             // como usa a classe do outro arquivo?
             const status = new StatusChamado();
-            await stepContext.context.sendActivity(status);
-            console.log('passei aqui');
+            stepContext.replaceDialog(status);
+            // await stepContext.context.sendActivity();
             break;
         }
 
@@ -116,27 +117,6 @@ class MainDialog extends ComponentDialog {
         }
 
         return await stepContext.next();
-    }
-
-    /**
-     * Shows a warning if the requested From or To cities are recognized as entities but they are not in the Airport entity list.
-     * In some cases LUIS will recognize the From and To composite entities as a valid cities but the From and To Airport values
-     * will be empty if those entity values can't be mapped to a canonical item in the Airport.
-     */
-    async showWarningForUnsupportedCities(context, fromEntities, toEntities) {
-        const unsupportedCities = [];
-        if (fromEntities.from && !fromEntities.airport) {
-            unsupportedCities.push(fromEntities.from);
-        }
-
-        if (toEntities.to && !toEntities.airport) {
-            unsupportedCities.push(toEntities.to);
-        }
-
-        if (unsupportedCities.length) {
-            const messageText = `Sorry but the following airports are not supported: ${ unsupportedCities.join(', ') }`;
-            await context.sendActivity(messageText, messageText, InputHints.IgnoringInput);
-        }
     }
 
     /**
