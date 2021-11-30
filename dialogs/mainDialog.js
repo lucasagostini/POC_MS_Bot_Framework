@@ -6,6 +6,7 @@ const { MessageFactory, InputHints } = require('botbuilder');
 const { LuisRecognizer } = require('botbuilder-ai');
 const { ComponentDialog, DialogSet, DialogTurnStatus, TextPrompt, WaterfallDialog } = require('botbuilder-dialogs');
 const moment = require('moment-timezone');
+const { StatusChamado } = require('./statusChamado');
 
 const MAIN_WATERFALL_DIALOG = 'mainWaterfallDialog';
 
@@ -81,7 +82,7 @@ class MainDialog extends ComponentDialog {
         // Call LUIS and gather any potential booking details. (Note the TurnContext has the response to the prompt)
         const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
         switch (LuisRecognizer.topIntent(luisResult)) {
-        case 'BookFlight': {
+        case 'TrocaPagamento': {
             // Extract the values for the composite entities from the LUIS result.
             const fromEntities = this.luisRecognizer.getFromEntities(luisResult);
             const toEntities = this.luisRecognizer.getToEntities(luisResult);
@@ -99,16 +100,17 @@ class MainDialog extends ComponentDialog {
             return await stepContext.beginDialog('bookingDialog', bookingDetails);
         }
 
-        case 'GetWeather': {
-            // We haven't implemented the GetWeatherDialog so we just display a TODO message.
-            const getWeatherMessageText = 'TODO: get weather flow here';
-            await stepContext.context.sendActivity(getWeatherMessageText, getWeatherMessageText, InputHints.IgnoringInput);
+        case 'StatusChamado': {
+            // como usa a classe do outro arquivo?
+            const status = new StatusChamado();
+            await stepContext.context.sendActivity(status);
+            console.log('passei aqui');
             break;
         }
 
         default: {
             // Catch all for unhandled intents
-            const didntUnderstandMessageText = `Sorry, I didn't get that. Please try asking in a different way (intent was ${ LuisRecognizer.topIntent(luisResult) })`;
+            const didntUnderstandMessageText = `Desculpe, não consegui entender. Tente falar de outra forma ou tente novamente mais tarde! (intent was ${ LuisRecognizer.topIntent(luisResult) })`;
             await stepContext.context.sendActivity(didntUnderstandMessageText, didntUnderstandMessageText, InputHints.IgnoringInput);
         }
         }

@@ -17,9 +17,9 @@ class StatusChamado extends CancelAndHelpDialog {
     }
 
     async initialStep(stepContext) {
-        await context.sendActivity('Fluxo ainda não implementado!');
+        await stepContext.sendActivity('Fluxo ainda não implementado!');
         return await stepContext.endDialog();
     }
 }
 
-module.exports.DateResolverDialog = StatusChamado;
+module.exports.StatusChamado = StatusChamado;
