@@ -25,11 +25,21 @@ class DialogAndWelcomeBot extends DialogBot {
             } else {
                 await context.sendActivity(WelcomeCard.messages.ola);
             }
-            // await dialog.run(context, conversationState.createProperty('DialogState'));
-            await context.sendActivity('teste');
+            if (userAuth()) {
+                // to do usuario autenticado
+            } else {
+                // to do usuario nao autenticado
+            }
+            await dialog.run(context, conversationState.createProperty('DialogState'));
             await next();
         });
     }
+}
+function userAuth(token) {
+    // if (usuarios.includes('')) {
+    // to do u
+    // }
+    return true;
 }
 
 module.exports.DialogAndWelcomeBot = DialogAndWelcomeBot;

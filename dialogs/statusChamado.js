@@ -10,8 +10,7 @@ class StatusChamado extends CancelAndHelpDialog {
     constructor(id) {
         super(id || 'statusChamado');
         this.addDialog(new WaterfallDialog(WATERFALL_DIALOG, [
-            this.initialStep.bind(this),
-            this.finalStep.bind(this)
+            this.initialStep.bind(this)
         ]));
 
         this.initialDialogId = WATERFALL_DIALOG;
@@ -19,10 +18,6 @@ class StatusChamado extends CancelAndHelpDialog {
 
     async initialStep(stepContext) {
         await context.sendActivity('Fluxo ainda não implementado!');
-        await stepContext.next();
-    }
-
-    async finalStep(stepContext) {
         return await stepContext.endDialog();
     }
 }
