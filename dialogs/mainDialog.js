@@ -72,11 +72,9 @@ class MainDialog extends ComponentDialog {
      * Then, it hands off to the bookingDialog child dialog to collect any remaining details.
      */
     async actStep(stepContext) {
-        const bookingDetails = {};
-
         if (!this.luisRecognizer.isConfigured) {
             // LUIS is not configured, we just run the BookingDialog path.
-            return await stepContext.beginDialog('bookingDialog', bookingDetails);
+            // return await stepContext.beginDialog('bookingDialog', bookingDetails);
         }
 
         // Call LUIS and gather any potential booking details. (Note the TurnContext has the response to the prompt)
@@ -111,7 +109,10 @@ class MainDialog extends ComponentDialog {
 
         default: {
             // Catch all for unhandled intents
-            const didntUnderstandMessageText = `Desculpe, não consegui entender. Tente falar de outra forma ou tente novamente mais tarde! (intent was ${ LuisRecognizer.topIntent(luisResult) })`;
+            const didntUnderstandMessageText = `Como posso te ajudar?
+
+            1 - Mudar forma de pagamento
+            2 - Consultar o status de um chamado (intent was ${ LuisRecognizer.topIntent(luisResult) })`;
             await stepContext.context.sendActivity(didntUnderstandMessageText, didntUnderstandMessageText, InputHints.IgnoringInput);
         }
         }

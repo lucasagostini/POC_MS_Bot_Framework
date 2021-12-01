@@ -9,9 +9,12 @@ const path = require('path');
 // Note: Ensure you have a .env file and include LuisAppId, LuisAPIKey and LuisAPIHostName.
 const ENV_FILE = path.join(__dirname, '.env');
 require('dotenv').config({ path: ENV_FILE });
-const { LuisConfig } = require('./dialogs/luisConfig');
+const { LuisConfig } = require('./dialogs/flightBookingRecognizer');
+
+const { BookingDialog } = require('./dialogs/bookingDialog');
 
 const restify = require('restify');
+const BOOKING_DIALOG = 'bookingDialog';
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
@@ -81,9 +84,9 @@ const userState = new UserState(memoryStorage);
 
 // If configured, pass in the FlightBookingRecognizer.  (Defining it externally allows it to be mocked for tests)
 const { LuisAppId, LuisAPIKey, LuisAPIHostName } = process.env;
-const luisConfigStep = { applicationId: LuisAppId, endpointKey: LuisAPIKey, endpoint: `https://${ LuisAPIHostName }` };
+const luisConfig = { applicationId: LuisAppId, endpointKey: LuisAPIKey, endpoint: `https://${ LuisAPIHostName }` };
 
-const luisRecognizer = new LuisConfig(luisConfigStep);
+const luisRecognizer = new LuisConfig(luisConfig);
 
 // Create the main dialog.
 const bookingDialog = new BookingDialog(BOOKING_DIALOG);
