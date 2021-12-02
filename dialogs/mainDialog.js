@@ -71,6 +71,7 @@ class MainDialog extends ComponentDialog {
         const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
         switch (LuisRecognizer.topIntent(luisResult)) {
         case 'TrocaPagamento': {
+        //    await stepContext.replaceDialog('trocaPagamento');
             break;
         }
 
@@ -86,8 +87,8 @@ class MainDialog extends ComponentDialog {
             1 - Mudar forma de pagamento
             2 - Consultar o status de um chamado (intent was ${ LuisRecognizer.topIntent(luisResult) })`;
             await stepContext.context.sendActivity(didntUnderstandMessageText, didntUnderstandMessageText, InputHints.IgnoringInput);
-            // fazer um IF de 1 ou intent
-            // fazer um IF de 2 ou intent
+            // fazer um IF de 1 
+            // fazer um IF de 2
             // else mensagem de desculpa
         }
         }
