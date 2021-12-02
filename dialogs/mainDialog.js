@@ -5,9 +5,12 @@ const { InputHints } = require('botbuilder');
 const { LuisRecognizer } = require('botbuilder-ai');
 const { ComponentDialog, DialogSet, DialogTurnStatus, TextPrompt, WaterfallDialog } = require('botbuilder-dialogs');
 const { StatusChamado } = require('./statusChamado');
+const { TrocaPagamento } = require('./trocaPagamento');
 
 const MAIN_WATERFALL_DIALOG = 'mainWaterfallDialog';
 const STATUS_CHAMADO = 'statusChamado';
+const TROCA_PAGAMENTO = 'trocaPagamento';
+
 class MainDialog extends ComponentDialog {
     constructor(luisRecognizer, bookingDialog) {
         super('MainDialog');
@@ -21,6 +24,7 @@ class MainDialog extends ComponentDialog {
         // This is a sample "book a flight" dialog.
         this.addDialog(new TextPrompt('TextPrompt'))
             .addDialog(bookingDialog)
+            .addDialog(new TrocaPagamento(TROCA_PAGAMENTO))
             .addDialog(new StatusChamado(STATUS_CHAMADO))
             .addDialog(new WaterfallDialog(MAIN_WATERFALL_DIALOG, [
                 this.introStep.bind(this),
@@ -71,7 +75,7 @@ class MainDialog extends ComponentDialog {
         const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
         switch (LuisRecognizer.topIntent(luisResult)) {
         case 'TrocaPagamento': {
-        //    await stepContext.replaceDialog('trocaPagamento');
+            await stepContext.replaceDialog('trocaPagamento');
             break;
         }
 
