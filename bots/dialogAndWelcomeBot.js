@@ -18,28 +18,17 @@ class DialogAndWelcomeBot extends DialogBot {
             // (and only the first time) a user initiates a personal chat with your bot.
             if (!didBotWelcomedUser) {
                 // The channel should send the user name in the 'From' object
-                await context.sendActivity(WelcomeCard.messages.welcomeMessage);
+                await context.sendActivity(WelcomeCard.welcomeMessages.welcomeMessage);
 
                 // Set the flag indicating the bot handled the user's first message.
                 await this.welcomedUserProperty.set(context, true);
             } else {
-                await context.sendActivity(WelcomeCard.messages.ola);
-            }
-            if (userAuth()) {
-                // to do usuario autenticado
-            } else {
-                // to do usuario nao autenticado
+                await context.sendActivity(WelcomeCard.welcomeMessages.ola);
             }
             await dialog.run(context, conversationState.createProperty('DialogState'));
             await next();
         });
     }
-}
-function userAuth(token) {
-    // if (usuarios.includes('')) {
-    // to do u
-    // }
-    return true;
 }
 
 module.exports.DialogAndWelcomeBot = DialogAndWelcomeBot;
