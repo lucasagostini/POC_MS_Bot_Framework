@@ -15,7 +15,7 @@ class StatusChamado extends ComponentDialog {
 
     async initialStep(stepContext) {
         await stepContext.context.sendActivity('Fluxo ainda não implementado!');
-        return stepContext.endDialog();
+        return stepContext.cancelAllDialogs();
     }
 }
 
