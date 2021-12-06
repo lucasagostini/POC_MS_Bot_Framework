@@ -14,16 +14,15 @@ class DialogAndWelcomeBot extends DialogBot {
         this.onMembersAdded(async (context, next) => {
             const didBotWelcomedUser = await this.welcomedUserProperty.get(context, false);
 
-            // Your bot should proactively send a welcome message to a personal chat the first time
-            // (and only the first time) a user initiates a personal chat with your bot.
             if (!didBotWelcomedUser) {
-                // The channel should send the user name in the 'From' object
                 await context.sendActivity(WelcomeCard.welcomeMessages.welcomeMessage);
-
-                // Set the flag indicating the bot handled the user's first message.
                 await this.welcomedUserProperty.set(context, true);
+                // await this.beginDialog(authUser);
             } else {
                 await context.sendActivity(WelcomeCard.welcomeMessages.ola);
+                /* if (!searchAuth()) {
+                    await this.beginDialog(authUser);
+                } */
             }
             await dialog.run(context, conversationState.createProperty('DialogState'));
             await next();
