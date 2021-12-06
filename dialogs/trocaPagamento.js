@@ -1,19 +1,15 @@
 // const { LuisRecognizer, LuisBotComponent, LuisAdaptiveRecognizer } = require('botbuilder-ai');
-const { ConfirmPrompt, ComponentDialog, TextPrompt, WaterfallDialog } = require('botbuilder-dialogs');
+const { ConfirmPrompt, ComponentDialog, WaterfallDialog } = require('botbuilder-dialogs');
 // const { isEntity } = require('botframework-schema');
-const { DateResolverDialog } = require('./dateResolverDialog');
+// const { DateResolverDialog } = require('./dateResolverDialog');
 // const messagesPay = require('./resources/trocaPagamento');
 const CONFIRM_PROMPT = 'confirmPrompt';
-const DATE_RESOLVER_DIALOG = 'dateResolverDialog';
-const TEXT_PROMPT = 'textPrompt';
 const TROCA_PAGAMENTO = 'trocaPagamento';
 
 class TrocaPagamento extends ComponentDialog {
     constructor(id) {
         super(id || TROCA_PAGAMENTO);
-        this.addDialog(new TextPrompt(TEXT_PROMPT))
-            .addDialog(new ConfirmPrompt(CONFIRM_PROMPT))
-            .addDialog(new DateResolverDialog(DATE_RESOLVER_DIALOG))
+        this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT))
             .addDialog(new WaterfallDialog(TROCA_PAGAMENTO, [
                 this.initialStep.bind(this),
                 this.ticketOpened(this),
@@ -39,9 +35,8 @@ class TrocaPagamento extends ComponentDialog {
             await stepContext.context.sendActivity(messagesPay.chamado);
             if (ticketLate()) {
                 await stepContext.context.sendActivity(messagesPay.ticketLate);
-            } await stepContext.context.TextPrompt(messagesPay.ajudaSolicitacao, ['Sim'], ['Não']);
-            // ler o prompt se sim ou não
-            if (true) {
+            } await stepContext.prompt(CONFIRM_PROMPT, messagesAuth.ajudaSolicitacao, ['Sim', 'Não']);
+            if (stepContext.result) {
                 await stepContext.context.sendActivity(messagesPay.resolverSolicitacao);
             } else{
                 await stepContext.context.sendActivity(messagesPay.tudoBem);
@@ -49,7 +44,7 @@ class TrocaPagamento extends ComponentDialog {
         } else {
             await stepContext.replaceDialog(changePayType);
         } */
-        await stepContext.context.sendActivity('2!');
+        // await stepContext.context.sendActivity('2!');
         return stepContext.endDialog();
     }
 
@@ -75,13 +70,13 @@ class TrocaPagamento extends ComponentDialog {
                 }
             }
         } */
-        await stepContext.context.sendActivity('3!');
+        // await stepContext.context.sendActivity('3!');
         return stepContext.endDialog();
     }
 
     async toOpenTicket(stepContext) {
         /* await stepContext.context.sendActivity(messagesPay.abrindoChamado);
-        if (abrirChamado) {
+        if (abrirChamado()) {
             await stepContext.context.sendActivity(messagesPay.abriuChamado);
         } else {
             await stepContext.context.sendActivity(messagesPay.naoAbriuChamado);

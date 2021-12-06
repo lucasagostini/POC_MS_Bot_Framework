@@ -95,6 +95,7 @@ class MainDialog extends ComponentDialog {
             // fazer um IF de 2
             // else mensagem de desculpa
         }
+            await stepContext.endDialog();
         }
     }
 }
