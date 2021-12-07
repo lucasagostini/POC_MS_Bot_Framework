@@ -2,20 +2,20 @@
 const { ConfirmPrompt, ComponentDialog, WaterfallDialog } = require('botbuilder-dialogs');
 // const { isEntity } = require('botframework-schema');
 // const { DateResolverDialog } = require('./dateResolverDialog');
-// const messagesPay = require('./resources/trocaPagamento');
+const messagesPay = require('../bots/resources/messagesPay.js');
+const { ChangePayType } = require('./changePayType.js');
 const CONFIRM_PROMPT = 'confirmPrompt';
 const TROCA_PAGAMENTO = 'trocaPagamento';
-
+const CHANGE_PAY = 'changePayType';
 class TrocaPagamento extends ComponentDialog {
     constructor(id) {
         super(id || TROCA_PAGAMENTO);
         this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT))
+            .addDialog(new ChangePayType(CHANGE_PAY))
             .addDialog(new WaterfallDialog(TROCA_PAGAMENTO, [
                 this.initialStep.bind(this),
-                this.ticketOpened(this),
-                this.changePayType(this),
-                this.toOpenTicket(this),
-                this.checkDate(this)
+                this.ticketOpened.bind(this),
+                this.needHelp.bind(this)
             ]));
 
         this.initialDialogId = TROCA_PAGAMENTO;
@@ -23,86 +23,51 @@ class TrocaPagamento extends ComponentDialog {
 
     async initialStep(stepContext) {
         // pegar intent e informações da mensagem inicial
-        await stepContext.context.sendActivity('1!');
         return stepContext.next();
     }
 
     async ticketOpened(stepContext) {
-        // implementar hasticket,ticketlate
-        /*
-        if (hasTicket()) {
-            await stepContext.context.sendActivity(messagesPay.ticketOpen);
-            await stepContext.context.sendActivity(messagesPay.chamado);
-            if (ticketLate()) {
-                await stepContext.context.sendActivity(messagesPay.ticketLate);
-            } await stepContext.prompt(CONFIRM_PROMPT, messagesAuth.ajudaSolicitacao, ['Sim', 'Não']);
-            if (stepContext.result) {
-                await stepContext.context.sendActivity(messagesPay.resolverSolicitacao);
-            } else{
-                await stepContext.context.sendActivity(messagesPay.tudoBem);
-            }
+        const userTicket = hasTicket();
+        if (userTicket) {
+            await stepContext.context.sendActivity(messagesPay.messagesFluxo.ticketAberto);
+            await stepContext.context.sendActivity(messagesPay.messagesFluxo.chamado);
+            if (userTicket.atrasado) {
+                await stepContext.context.sendActivity(messagesPay.messagesFluxo.atrasado);
+            } return stepContext.prompt(CONFIRM_PROMPT, messagesPay.messagesFluxo.ajudaSolicitacao, ['Sim', 'Não']);
         } else {
-            await stepContext.replaceDialog(changePayType);
-        } */
-        // await stepContext.context.sendActivity('2!');
-        return stepContext.endDialog();
+            return stepContext.replaceDialog(CHANGE_PAY);
+        }
     }
 
-    async changePayType(stepContext) {
-        /* if (cheque | boleto | dinheiro) {
-            await stepContext.context.sendActivity(messagesPay.formaInformada);
-            await stepContext.replaceDialog(this.checkDate);
+    async needHelp(stepContext) {
+        if (stepContext.result) {
+            await stepContext.context.sendActivity(messagesPay.messagesFluxo.resolverSolicitacao);
         } else {
-            await stepContext.context.sendActivity(messagesPay.formaNaoInformada);
-            if (cheque | boleto | dinheiro) {
-                await stepContext.replaceDialog(this.checkDate);
-            } else {
-                if (cartao) {
-                    await stepContext.context.sendActivity(messagesPay.naoCartao);
-                    await stepContext.context.sendActivity(messagesPay.formasValidas);
-                    if (cartao) {
-                        await stepContext.context.sendActivity(messagesPay.naoNaoCartao);
-                        await stepContext.endDialog();
-                    }
-                    if (cheque | boleto | dinheiro | 1 | 2 | 3) {
-                        await stepContext.replaceDialog(this.checkDate);
-                    }
-                }
-            }
-        } */
-        // await stepContext.context.sendActivity('3!');
+            await stepContext.context.sendActivity(messagesPay.messagesFluxo.tudoBem);
+        }
         return stepContext.endDialog();
     }
+}
 
-    async toOpenTicket(stepContext) {
-        /* await stepContext.context.sendActivity(messagesPay.abrindoChamado);
-        if (abrirChamado()) {
-            await stepContext.context.sendActivity(messagesPay.abriuChamado);
-        } else {
-            await stepContext.context.sendActivity(messagesPay.naoAbriuChamado);
-        } */
-        return stepContext.endDialog();
-    }
+function hasTicket() {
+    //  to do struct que une usuario + atrasado
+    var usuario = {
+        ticket: {
+            data: 1,
+            numero: 202112061430
+        },
+        atrasado: false
+    };
 
-    async checkDate(stepContext) {
-        /* if (data) {
-            await stepContext.replaceDialog(this.toOpenTicket);
-        } else {
-            await stepContext.context.sendActivity(messagesPay.qualPrazo);
-            if (prazo >= 8) {
-                await stepContext.context.sendActivity(messagesPay.prazoInvalido);
-                if (prazo >= 8) {
-                    await stepContext.context.sendActivity(messagesPay.prazoImpossivel);
-                    await stepContext.endDialog();
-                } else {
-                    await stepContext.replaceDialog(this.toOpenTicket);
-                }
-            } else {
-                await stepContext.replaceDialog(this.toOpenTicket);
-            }
-        } */
-        return stepContext.endDialog();
+    // for (let i = 0; i < usuario.length; i++) {
+    if (true) {
+        // usuario = users[i];
+        if (usuario.ticket.data < 2) {
+            usuario.atrasado = true;
+        }
     }
+    // }
+    return false;
 }
 
 module.exports.TrocaPagamento = TrocaPagamento;

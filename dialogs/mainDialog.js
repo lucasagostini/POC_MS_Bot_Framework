@@ -4,8 +4,8 @@
 const { InputHints } = require('botbuilder');
 const { LuisRecognizer } = require('botbuilder-ai');
 const { ComponentDialog, DialogSet, DialogTurnStatus, TextPrompt, WaterfallDialog } = require('botbuilder-dialogs');
-const { StatusChamado } = require('./statusChamado');
-const { TrocaPagamento } = require('./trocaPagamento');
+const { StatusChamado } = require('./statusChamado.js');
+const { TrocaPagamento } = require('./trocaPagamento.js');
 
 const MAIN_WATERFALL_DIALOG = 'mainWaterfallDialog';
 const STATUS_CHAMADO = 'statusChamado';
@@ -75,13 +75,11 @@ class MainDialog extends ComponentDialog {
         const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
         switch (LuisRecognizer.topIntent(luisResult)) {
         case 'TrocaPagamento': {
-            // await stepContext.replaceDialog('trocaPagamento');
-            break;
+            return stepContext.replaceDialog('trocaPagamento');
         }
 
         case 'StatusChamado': {
-            await stepContext.replaceDialog('statusChamado');
-            break;
+            return stepContext.replaceDialog('statusChamado');
         }
 
         default: {
@@ -95,7 +93,7 @@ class MainDialog extends ComponentDialog {
             // fazer um IF de 2
             // else mensagem de desculpa
         }
-            await stepContext.endDialog();
+            return stepContext.endDialog();
         }
     }
 }

@@ -51,8 +51,8 @@ class AuthUser extends ComponentDialog {
 // to do criar struct e passar como parametro
 function searchAuth(users) {
     for (let i = 0; i < users.lenght; i++) {
-        if (users[i].ticket) {
-            return users[i].ticket;
+        if (users[i].document === this.document) {
+            return users[i];
         }
     }
     return false;

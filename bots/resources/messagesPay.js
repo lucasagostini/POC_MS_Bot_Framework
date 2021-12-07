@@ -17,5 +17,4 @@ const messagesFluxo = {
     naoAbriuChamado: 'Desculpe, houve um problema ao abrir seu chamado. Tente novamente mais tarde!',
     abriuChamado: 'Pronto, aqui está o número do seu chamado: <NÚMERO DO CHAMADO>. O prazo para que a gente avalie sua solicitação é de até 2 dias úteis.'
 };
-
 module.exports.messagesFluxo = messagesFluxo;
