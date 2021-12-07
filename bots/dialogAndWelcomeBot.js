@@ -18,7 +18,7 @@ class DialogAndWelcomeBot extends DialogBot {
 
             if (!didBotWelcomedUser) {
                 await context.sendActivity(WelcomeCard.welcomeMessages.welcomeMessage);
-                await this.beginDialog(AUTH_USER);
+                // await this.beginDialog(AUTH_USER);
                 await this.welcomedUserProperty.set(context, true);
             } else {
                 await context.sendActivity(WelcomeCard.welcomeMessages.ola);

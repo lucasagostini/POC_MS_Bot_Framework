@@ -1,6 +1,6 @@
 // const { LuisRecognizer, LuisBotComponent, LuisAdaptiveRecognizer } = require('botbuilder-ai');
 // const { UserState } = require('botbuilder-core');
-const { ComponentDialog, WaterfallDialog, ConfirmPrompt, NumberPrompt, } = require('botbuilder-dialogs');
+const { ComponentDialog, WaterfallDialog, ConfirmPrompt, NumberPrompt } = require('botbuilder-dialogs');
 // const { isEntity } = require('botframework-schema');
 // const { DateResolverDialog } = require('./dateResolverDialog');
 const { cpf, cnpj } = require('cpf-cnpj-validator');
