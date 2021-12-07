@@ -22,6 +22,7 @@ class ChangePayType extends ComponentDialog {
         const boleto = false;
         const dinheiro = false;
         const cartao = true;
+        // .entities.cheque
         if (cheque | boleto | dinheiro) {
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.formaInformada);
             await stepContext.replaceDialog(CHECK_DATE);

@@ -5,12 +5,11 @@ const { ConfirmPrompt, ComponentDialog, WaterfallDialog } = require('botbuilder-
 const messagesPay = require('../bots/resources/messagesPay.js');
 const { ChangePayType } = require('./changePayType.js');
 const { listaUsuarios } = require('./mainDialog.js');
+const { index } = require('./authUser.js');
 
 const CONFIRM_PROMPT = 'confirmPrompt';
 const TROCA_PAGAMENTO = 'trocaPagamento';
 const CHANGE_PAY = 'changePayType';
-
-const index = 1;
 
 class TrocaPagamento extends ComponentDialog {
     constructor(id) {
@@ -55,7 +54,6 @@ class TrocaPagamento extends ComponentDialog {
 }
 
 function hasTicket() {
-    // ERRADO, DESCOBRIR O USUARIO ATRAVES DE AUTH E PASSAR INDEX
     let atrasado = false;
     if (listaUsuarios[index].ticketNumber) {
         const date = new Date();

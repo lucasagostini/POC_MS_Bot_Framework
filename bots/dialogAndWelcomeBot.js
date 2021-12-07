@@ -1,16 +1,12 @@
 const { DialogBot } = require('./dialogBot');
 const WelcomeCard = require('./resources/welcomecard.js');
-const { AuthUser, searchAuth } = require('../dialogs/authUser.js');
 
-const AUTH_USER = 'authUser';
 const WELCOMED_USER = 'welcomedUserProperty';
-
+let welcomedUserProperty = null;
 class DialogAndWelcomeBot extends DialogBot {
     constructor(conversationState, userState, dialog) {
         super(conversationState, userState, dialog);
         this.welcomedUserProperty = userState.createProperty(WELCOMED_USER);
-        // como fazer isso?
-        // this.addDialog(new AuthUser(AUTH_USER));
         this.userState = userState;
 
         this.onMembersAdded(async (context, next) => {
@@ -18,8 +14,8 @@ class DialogAndWelcomeBot extends DialogBot {
 
             if (!didBotWelcomedUser) {
                 await context.sendActivity(WelcomeCard.welcomeMessages.welcomeMessage);
-                // await this.beginDialog(AUTH_USER);
                 await this.welcomedUserProperty.set(context, true);
+                welcomedUserProperty = true;
             } else {
                 await context.sendActivity(WelcomeCard.welcomeMessages.ola);
             }
@@ -29,4 +25,7 @@ class DialogAndWelcomeBot extends DialogBot {
     }
 }
 
-module.exports.DialogAndWelcomeBot = DialogAndWelcomeBot;
+module.exports = {
+    DialogAndWelcomeBot,
+    welcomedUserProperty
+};

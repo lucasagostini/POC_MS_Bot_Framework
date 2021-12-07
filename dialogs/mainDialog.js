@@ -1,20 +1,26 @@
 const { InputHints } = require('botbuilder');
 const { LuisRecognizer } = require('botbuilder-ai');
-const { ComponentDialog, DialogSet, DialogTurnStatus, TextPrompt, WaterfallDialog } = require('botbuilder-dialogs');
+const { ComponentDialog, DialogSet, DialogTurnStatus, TextPrompt, WaterfallDialog, NumberPrompt } = require('botbuilder-dialogs');
+const { AuthUser } = require('./authUser.js');
 const { StatusChamado } = require('./statusChamado.js');
 const { TrocaPagamento } = require('./trocaPagamento.js');
+const { welcomedUserProperty } = require('../bots/dialogAndWelcomeBot.js');
 
+const AUTH_USER = 'authUser';
 const MAIN_WATERFALL_DIALOG = 'mainWaterfallDialog';
 const STATUS_CHAMADO = 'statusChamado';
 const TROCA_PAGAMENTO = 'trocaPagamento';
+const NUMBER_PROMPT = 'NUMBER_PROMPT';
 
-function Users(documento, ticketData, ticketNumber, ticketType, ticketStat, ticketRes) {
-    this.documento = documento;
-    this.ticketData = ticketData;
-    this.ticketNumber = ticketNumber;
-    this.ticketType = ticketType;
-    this.ticketStat = ticketStat;
-    this.ticketRes = ticketRes;
+class Users {
+    constructor(documento, ticketData, ticketNumber, ticketType, ticketStat, ticketRes) {
+        this.documento = documento;
+        this.ticketData = ticketData;
+        this.ticketNumber = ticketNumber;
+        this.ticketType = ticketType;
+        this.ticketStat = ticketStat;
+        this.ticketRes = ticketRes;
+    }
 }
 const listaUsuarios = [
     new Users(
@@ -46,13 +52,16 @@ class MainDialog extends ComponentDialog {
 
         if (!bookingDialog) throw new Error('[MainDialog]: Missing parameter \'bookingDialog\' is required');
 
-        this.addDialog(new TextPrompt('TextPrompt'))
+        this.addDialog(new NumberPrompt(NUMBER_PROMPT))
+            .addDialog(new TextPrompt('TextPrompt'))
             .addDialog(bookingDialog)
+            .addDialog(new AuthUser(AUTH_USER))
             .addDialog(new TrocaPagamento(TROCA_PAGAMENTO))
             .addDialog(new StatusChamado(STATUS_CHAMADO))
             .addDialog(new WaterfallDialog(MAIN_WATERFALL_DIALOG, [
                 this.introStep.bind(this),
-                this.actStep.bind(this)
+                this.actStep.bind(this),
+                this.finalStep.bind(this)
             ]));
 
         this.initialDialogId = MAIN_WATERFALL_DIALOG;
@@ -76,11 +85,15 @@ class MainDialog extends ComponentDialog {
             return stepContext.next();
         }
 
-        return stepContext.prompt('TextPrompt');
+        if (welcomedUserProperty) {
+            return stepContext.next();
+        } else {
+            return stepContext.replaceDialog(AUTH_USER);
+        }
     }
 
     async actStep(stepContext) {
-        // Call LUIS and gather any potential booking details. (Note the TurnContext has the response to the prompt)
+        // como salvar pra usar no changepaytype
         const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
         switch (LuisRecognizer.topIntent(luisResult)) {
         case 'TrocaPagamento': {
@@ -97,12 +110,17 @@ class MainDialog extends ComponentDialog {
 
             1 - Mudar forma de pagamento
             2 - Consultar o status de um chamado (intent was ${ LuisRecognizer.topIntent(luisResult) })`;
-            await stepContext.context.sendActivity(didntUnderstandMessageText, didntUnderstandMessageText, InputHints.IgnoringInput);
-            // fazer um IF de 1
-            // fazer um IF de 2
-            // else mensagem de desculpa
+            return stepContext.context.prompt(NUMBER_PROMPT, didntUnderstandMessageText, ['1', '2']);
         }
-            return stepContext.endDialog();
+        }
+    }
+
+    async finalStep(stepContext) {
+        if (stepContext.results === 1) {
+            return stepContext.replaceDialog('trocaPagamento');
+        }
+        if (stepContext.results === 2) {
+            return stepContext.replaceDialog('statusChamado');
         }
     }
 }
