@@ -4,9 +4,14 @@ const { ConfirmPrompt, ComponentDialog, WaterfallDialog } = require('botbuilder-
 // const { DateResolverDialog } = require('./dateResolverDialog');
 const messagesPay = require('../bots/resources/messagesPay.js');
 const { ChangePayType } = require('./changePayType.js');
+const { listaUsuarios } = require('./mainDialog.js');
+
 const CONFIRM_PROMPT = 'confirmPrompt';
 const TROCA_PAGAMENTO = 'trocaPagamento';
 const CHANGE_PAY = 'changePayType';
+
+const index = 1;
+
 class TrocaPagamento extends ComponentDialog {
     constructor(id) {
         super(id || TROCA_PAGAMENTO);
@@ -27,11 +32,11 @@ class TrocaPagamento extends ComponentDialog {
     }
 
     async ticketOpened(stepContext) {
-        const userTicket = hasTicket();
-        if (userTicket) {
+        const atrasado = hasTicket();
+        if (listaUsuarios[index].ticketNumber) {
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.ticketAberto);
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.chamado);
-            if (userTicket.atrasado) {
+            if (atrasado) {
                 await stepContext.context.sendActivity(messagesPay.messagesFluxo.atrasado);
             } return stepContext.prompt(CONFIRM_PROMPT, messagesPay.messagesFluxo.ajudaSolicitacao, ['Sim', 'Não']);
         } else {
@@ -50,24 +55,17 @@ class TrocaPagamento extends ComponentDialog {
 }
 
 function hasTicket() {
-    //  to do struct que une usuario + atrasado
-    var usuario = {
-        ticket: {
-            data: 1,
-            numero: 202112061430
-        },
-        atrasado: false
-    };
-
-    // for (let i = 0; i < usuario.length; i++) {
-    if (true) {
-        // usuario = users[i];
-        if (usuario.ticket.data < 2) {
-            usuario.atrasado = true;
+    // ERRADO, DESCOBRIR O USUARIO ATRAVES DE AUTH E PASSAR INDEX
+    let atrasado = false;
+    if (listaUsuarios[index].ticketNumber) {
+        const date = new Date();
+        const mes = date.getMonth() + 1;
+        const dia = date.getFullYear().toString() + mes.toString() + date.getDate().toString();
+        if (listaUsuarios[index].ticketRes < dia) {
+            atrasado = true;
         }
     }
-    // }
-    return false;
+    return atrasado;
 }
 
 module.exports.TrocaPagamento = TrocaPagamento;
