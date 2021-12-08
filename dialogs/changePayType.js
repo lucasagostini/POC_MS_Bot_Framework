@@ -15,10 +15,11 @@ class ChangePayType extends ComponentDialog {
     }
 
     async initialStep(stepContext) {
+        // to do ler entities;
         const cheque = false;
         const boleto = false;
         const dinheiro = false;
-        const cartao = true;
+        const cartao = false;
         // .entities.cheque
         if (cheque || boleto || dinheiro) {
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.formaInformada);

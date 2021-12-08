@@ -1,8 +1,7 @@
 const { ConfirmPrompt, ComponentDialog, WaterfallDialog } = require('botbuilder-dialogs');
 const messagesPay = require('../bots/resources/messagesPay.js');
 const { ChangePayType } = require('./changePayType.js');
-const { listaUsuarios } = require('./mainDialog.js');
-const { index } = require('./authUser.js');
+// const { index } = require('./authUser.js');
 
 const CONFIRM_PROMPT = 'confirmPrompt';
 const TROCA_PAGAMENTO = 'trocaPagamento';
@@ -24,12 +23,14 @@ class TrocaPagamento extends ComponentDialog {
 
     async initialStep(stepContext) {
         // pegar intent e informações da mensagem inicial
+        stepContext.values.listaUsuarios = stepContext.options;
         return stepContext.next();
     }
 
     async ticketOpened(stepContext) {
-        const atrasado = hasTicket();
-        if (listaUsuarios[index].ticketNumber) {
+        const atrasado = hasTicket(stepContext.values.listaUsuarios);
+        const index = 2;
+        if (stepContext.values.listaUsuarios[index].ticketNumber) {
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.ticketAberto);
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.chamado);
             if (atrasado) {
@@ -50,8 +51,9 @@ class TrocaPagamento extends ComponentDialog {
     }
 }
 
-function hasTicket() {
+function hasTicket(listaUsuarios) {
     let atrasado = false;
+    const index = 2;
     if (listaUsuarios[index].ticketNumber) {
         const date = new Date();
         const mes = date.getMonth() + 1;

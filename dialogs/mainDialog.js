@@ -24,14 +24,14 @@ class Users {
 }
 const listaUsuarios = [
     new Users(
-        '01234567890',
+        '12345678901',
         20211207,
         1,
         'Alteração de Dados',
         'Em Andamento',
         20211209),
     new Users(
-        '01234567891',
+        '12345678902',
         20211205,
         2,
         'Alteração de Dados',
@@ -39,7 +39,7 @@ const listaUsuarios = [
         20211207
     ),
     new Users(
-        '01234567892'
+        '12345678903'
     )
 ];
 
@@ -88,7 +88,7 @@ class MainDialog extends ComponentDialog {
         if (welcomedUserProperty) {
             return stepContext.next();
         } else {
-            return stepContext.replaceDialog(AUTH_USER);
+            return stepContext.beginDialog(AUTH_USER, listaUsuarios);
         }
     }
 
@@ -97,11 +97,11 @@ class MainDialog extends ComponentDialog {
         const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
         switch (LuisRecognizer.topIntent(luisResult)) {
         case 'TrocaPagamento': {
-            return stepContext.replaceDialog('trocaPagamento');
+            return stepContext.replaceDialog('trocaPagamento', listaUsuarios);
         }
 
         case 'StatusChamado': {
-            return stepContext.replaceDialog('statusChamado');
+            return stepContext.replaceDialog('statusChamado', listaUsuarios);
         }
 
         default: {
@@ -110,22 +110,21 @@ class MainDialog extends ComponentDialog {
 
             1 - Mudar forma de pagamento
             2 - Consultar o status de um chamado (intent was ${ LuisRecognizer.topIntent(luisResult) })`;
-            return stepContext.context.prompt(NUMBER_PROMPT, didntUnderstandMessageText, ['1', '2']);
+            return stepContext.prompt(NUMBER_PROMPT, didntUnderstandMessageText, ['1', '2']);
         }
         }
     }
 
     async finalStep(stepContext) {
-        if (stepContext.results === 1) {
-            return stepContext.replaceDialog('trocaPagamento');
+        if (stepContext.result === 1) {
+            return stepContext.replaceDialog('trocaPagamento', listaUsuarios);
         }
-        if (stepContext.results === 2) {
-            return stepContext.replaceDialog('statusChamado');
+        if (stepContext.result === 2) {
+            return stepContext.replaceDialog('statusChamado', listaUsuarios);
         }
     }
 }
 
 module.exports = {
-    MainDialog,
-    listaUsuarios
+    MainDialog
 };

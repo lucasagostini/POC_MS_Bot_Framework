@@ -1,7 +1,7 @@
 // const { listaUsuarios } = require('../../dialogs/mainDialog.js');
 // const { index } = require('../../dialogs/authUser.js');
 const Luis = 'cheque';
-const numero = 25;
+const numero = '25';
 const messagesFluxo = {
     ticketAberto: 'Vi aqui que você já tem um chamado aberto para alterar a forma ou o prazo de pagamento dos seus pedidos:    ',
     chamado: 'Número de protocolo do chamado', // : ${ listaUsuarios[index].ticketNumber } \n    Tipo do chamado: ${ listaUsuarios[index].ticketType } \n    Status: ${ listaUsuarios[index].ticketStat } \n    Criado em: ${ listaUsuarios[index].ticketData } \n  Resolução prevista para: ${ listaUsuarios[index].ticketRes }`,

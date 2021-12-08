@@ -1,7 +1,6 @@
 const { ComponentDialog, WaterfallDialog, ConfirmPrompt, NumberPrompt } = require('botbuilder-dialogs');
 const { cpf, cnpj } = require('cpf-cnpj-validator');
 const messagesAuth = require('../bots/resources/fluxoInicial.js');
-const { listaUsuarios } = require('./mainDialog.js');
 
 const CONFIRM_PROMPT = 'CONFIRM_PROMPT';
 const NUMBER_PROMPT = 'NUMBER_PROMPT';
@@ -26,15 +25,15 @@ class AuthUser extends ComponentDialog {
     }
 
     async initialStep(stepContext) {
+        stepContext.values.listaUsuarios = stepContext.options;
         return stepContext.prompt(NUMBER_PROMPT, messagesAuth.messagesInicial.informaDoc);
     }
 
     async secondStep(stepContext) {
-        index = searchAuth(stepContext.result);
+        index = searchAuth(stepContext.result, stepContext.values.listaUsuarios);
         if (index) {
             await stepContext.context.sendActivity(messagesAuth.messagesInicial.encontrei);
-            // ir pros intents
-            // return stepContext.replaceDialog();
+            return stepContext.endDialog();
         } else {
             await stepContext.context.sendActivity(messagesAuth.messagesInicial.naoEncontrei);
             return stepContext.prompt(CONFIRM_PROMPT, messagesAuth.messagesInicial.jaCliente, ['Sim', 'Não']);
@@ -52,7 +51,7 @@ class AuthUser extends ComponentDialog {
 
     async afterMiddleStep(stepContext) {
         if (typeof stepContext.result === 'number') {
-            index = searchAuth(stepContext.result);
+            index = searchAuth(stepContext.result, stepContext.values.listaUsuarios);
             return stepContext.next();
         }
         if (typeof stepContext.result === 'boolean') {
@@ -60,17 +59,16 @@ class AuthUser extends ComponentDialog {
         } else {
             await stepContext.context.sendActivity(messagesAuth.messagesInicial.quePena);
         }
-        return stepContext.endDialog();
+        return stepContext.cancelAllDialogs();
     }
 
     async finalStep(stepContext) {
         if (index) {
             await stepContext.context.sendActivity(messagesAuth.messagesInicial.encontrei);
-            // ir pros intents
-            // return stepContext.replaceDialog();
+            return stepContext.endDialog();
         } else {
             await stepContext.context.sendActivity(messagesAuth.messagesInicial.naoEncontreiFinal);
-            return stepContext.endDialog();
+            return stepContext.cancelAllDialogs();
         }
     }
 
@@ -82,9 +80,9 @@ class AuthUser extends ComponentDialog {
     }
 }
 
-function searchAuth(documento) {
+function searchAuth(documento, listaUsuarios) {
     for (let i = 0; i < listaUsuarios.length; i++) {
-        if (listaUsuarios[i].document === documento.toString()) {
+        if (listaUsuarios[i].documento === documento.toString()) {
             return i;
         }
     }
