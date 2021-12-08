@@ -1,4 +1,3 @@
-// const { LuisRecognizer, LuisBotComponent, LuisAdaptiveRecognizer } = require('botbuilder-ai');
 const { ComponentDialog, WaterfallDialog, NumberPrompt } = require('botbuilder-dialogs');
 const messagesPay = require('../bots/resources/messagesPay.js');
 const { ToOpenTicket } = require('./toOpenTicket.js');

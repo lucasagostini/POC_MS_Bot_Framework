@@ -1,7 +1,4 @@
-// const { LuisRecognizer, LuisBotComponent, LuisAdaptiveRecognizer } = require('botbuilder-ai');
 const { ComponentDialog, WaterfallDialog } = require('botbuilder-dialogs');
-// const { isEntity } = require('botframework-schema');
-// const { DateResolverDialog } = require('./dateResolverDialog');
 const messagesPay = require('../bots/resources/messagesPay.js');
 const { CheckDate } = require('./checkDate.js');
 const CHECK_DATE = 'checkDate';
@@ -23,12 +20,12 @@ class ChangePayType extends ComponentDialog {
         const dinheiro = false;
         const cartao = true;
         // .entities.cheque
-        if (cheque | boleto | dinheiro) {
+        if (cheque || boleto || dinheiro) {
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.formaInformada);
             await stepContext.replaceDialog(CHECK_DATE);
         } else {
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.formaNaoInformada);
-            if (cheque | boleto | dinheiro) {
+            if (cheque || boleto || dinheiro) {
                 await stepContext.replaceDialog(CHECK_DATE);
             } else {
                 if (cartao) {
@@ -38,7 +35,7 @@ class ChangePayType extends ComponentDialog {
                         await stepContext.context.sendActivity(messagesPay.messagesFluxo.naoNaoCartao);
                         await stepContext.cancelAllDialogs();
                     }
-                    if (cheque | boleto | dinheiro | 1 | 2 | 3) {
+                    if (cheque || boleto || dinheiro) {
                         await stepContext.replaceDialog(CHECK_DATE);
                     }
                 }

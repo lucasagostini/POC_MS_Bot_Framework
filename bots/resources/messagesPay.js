@@ -1,5 +1,5 @@
-const { listaUsuarios } = require('../../dialogs/mainDialog.js');
-const { index } = require('../../dialogs/authUser.js');
+// const { listaUsuarios } = require('../../dialogs/mainDialog.js');
+// const { index } = require('../../dialogs/authUser.js');
 const Luis = 'cheque';
 const numero = 25;
 const messagesFluxo = {

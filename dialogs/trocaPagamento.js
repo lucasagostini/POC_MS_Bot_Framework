@@ -1,7 +1,4 @@
-// const { LuisRecognizer, LuisBotComponent, LuisAdaptiveRecognizer } = require('botbuilder-ai');
 const { ConfirmPrompt, ComponentDialog, WaterfallDialog } = require('botbuilder-dialogs');
-// const { isEntity } = require('botframework-schema');
-// const { DateResolverDialog } = require('./dateResolverDialog');
 const messagesPay = require('../bots/resources/messagesPay.js');
 const { ChangePayType } = require('./changePayType.js');
 const { listaUsuarios } = require('./mainDialog.js');

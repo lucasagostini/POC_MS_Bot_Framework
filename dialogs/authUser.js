@@ -1,8 +1,4 @@
-// const { LuisRecognizer, LuisBotComponent, LuisAdaptiveRecognizer } = require('botbuilder-ai');
-// const { UserState } = require('botbuilder-core');
 const { ComponentDialog, WaterfallDialog, ConfirmPrompt, NumberPrompt } = require('botbuilder-dialogs');
-// const { isEntity } = require('botframework-schema');
-// const { DateResolverDialog } = require('./dateResolverDialog');
 const { cpf, cnpj } = require('cpf-cnpj-validator');
 const messagesAuth = require('../bots/resources/fluxoInicial.js');
 const { listaUsuarios } = require('./mainDialog.js');
@@ -17,7 +13,7 @@ class AuthUser extends ComponentDialog {
     constructor(id) {
         super(id || USER_AUTH);
         this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT));
-        this.addDialog(new NumberPrompt(NUMBER_PROMPT, this.cpfCNPJvalidator));
+        this.addDialog(new NumberPrompt(NUMBER_PROMPT)); // , this.cpfCNPJvalidator));
         this.addDialog(new WaterfallDialog(USER_AUTH, [
             this.initialStep.bind(this),
             this.secondStep.bind(this),
@@ -30,8 +26,7 @@ class AuthUser extends ComponentDialog {
     }
 
     async initialStep(stepContext) {
-        await stepContext.context.sendActivity(messagesAuth.messagesInicial.informaDoc);
-        return stepContext.prompt(NUMBER_PROMPT);
+        return stepContext.prompt(NUMBER_PROMPT, messagesAuth.messagesInicial.informaDoc);
     }
 
     async secondStep(stepContext) {
@@ -80,7 +75,7 @@ class AuthUser extends ComponentDialog {
     }
 
     async cpfCNPJvalidator(stepContext) {
-        if (cnpj.isValid(stepContext.result) | cpf.isValid(stepContext.result)) {
+        if (cnpj.isValid(stepContext.result) || cpf.isValid(stepContext.result)) {
             return true;
         }
         return false;
@@ -88,7 +83,7 @@ class AuthUser extends ComponentDialog {
 }
 
 function searchAuth(documento) {
-    for (let i = 0; i < listaUsuarios.lenght; i++) {
+    for (let i = 0; i < listaUsuarios.length; i++) {
         if (listaUsuarios[i].document === documento) {
             return i;
         }
