@@ -84,7 +84,7 @@ class AuthUser extends ComponentDialog {
 
 function searchAuth(documento) {
     for (let i = 0; i < listaUsuarios.length; i++) {
-        if (listaUsuarios[i].document === documento) {
+        if (listaUsuarios[i].document === documento.toString()) {
             return i;
         }
     }
