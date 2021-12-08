@@ -1,12 +1,12 @@
 // const { LuisRecognizer, LuisBotComponent, LuisAdaptiveRecognizer } = require('botbuilder-ai');
 const { ComponentDialog, WaterfallDialog, NumberPrompt } = require('botbuilder-dialogs');
-// const { isEntity } = require('botframework-schema');
-// const { DateResolverDialog } = require('./dateResolverDialog');
 const messagesPay = require('../bots/resources/messagesPay.js');
 const { ToOpenTicket } = require('./toOpenTicket.js');
+
 const NUMBER_PROMPT = 'numberPrompt';
 const TO_OPEN_TICKET = 'toOpenTicket';
 const CHECK_DATE = 'checkDate';
+
 class CheckDate extends ComponentDialog {
     constructor(id) {
         super(id || CHECK_DATE);
