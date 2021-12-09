@@ -16,7 +16,7 @@ class ChangePayType extends ComponentDialog {
 
     async initialStep(stepContext) {
         // to do ler entities;
-        const cheque = false;
+        const cheque = true;
         const boleto = false;
         const dinheiro = false;
         const cartao = false;

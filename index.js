@@ -1,6 +1,3 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
-
 // index.js is used to setup and configure your bot
 
 // Import required packages
@@ -11,10 +8,7 @@ const ENV_FILE = path.join(__dirname, '.env');
 require('dotenv').config({ path: ENV_FILE });
 const { LuisConfig } = require('./dialogs/flightBookingRecognizer');
 
-const { BookingDialog } = require('./dialogs/bookingDialog');
-
 const restify = require('restify');
-const BOOKING_DIALOG = 'bookingDialog';
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
@@ -89,8 +83,7 @@ const luisConfig = { applicationId: LuisAppId, endpointKey: LuisAPIKey, endpoint
 const luisRecognizer = new LuisConfig(luisConfig);
 
 // Create the main dialog.
-const bookingDialog = new BookingDialog(BOOKING_DIALOG);
-const dialog = new MainDialog(luisRecognizer, bookingDialog);
+const dialog = new MainDialog(luisRecognizer, conversationState, userState);
 const bot = new DialogAndWelcomeBot(conversationState, userState, dialog);
 
 // Create HTTP server

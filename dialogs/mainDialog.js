@@ -4,13 +4,15 @@ const { ComponentDialog, DialogSet, DialogTurnStatus, TextPrompt, WaterfallDialo
 const { AuthUser } = require('./authUser.js');
 const { StatusChamado } = require('./statusChamado.js');
 const { TrocaPagamento } = require('./trocaPagamento.js');
-const { welcomedUserProperty } = require('../bots/dialogAndWelcomeBot.js');
+// const { welcomedUserProperty } = require('../bots/dialogAndWelcomeBot.js');
 
 const AUTH_USER = 'authUser';
 const MAIN_WATERFALL_DIALOG = 'mainWaterfallDialog';
 const STATUS_CHAMADO = 'statusChamado';
 const TROCA_PAGAMENTO = 'trocaPagamento';
 const NUMBER_PROMPT = 'NUMBER_PROMPT';
+const CONVERSATION_DATA_PROPERTY = 'conversationData';
+const USER_PROPERTY = 'userProperty';
 
 class Users {
     constructor(documento, ticketData, ticketNumber, ticketType, ticketStat, ticketRes) {
@@ -44,17 +46,19 @@ const listaUsuarios = [
 ];
 
 class MainDialog extends ComponentDialog {
-    constructor(luisRecognizer, bookingDialog) {
+    constructor(luisRecognizer, conversationState, userState) {
         super('MainDialog');
+
+        this.conversationDataAccessor = conversationState.createProperty(CONVERSATION_DATA_PROPERTY);
+        this.userPropertyAcessor = userState.createProperty(USER_PROPERTY);
+        this.userState = userState;
+        this.conversationState = conversationState;
 
         if (!luisRecognizer) throw new Error('[MainDialog]: Missing parameter \'luisRecognizer\' is required');
         this.luisRecognizer = luisRecognizer;
 
-        if (!bookingDialog) throw new Error('[MainDialog]: Missing parameter \'bookingDialog\' is required');
-
         this.addDialog(new NumberPrompt(NUMBER_PROMPT))
             .addDialog(new TextPrompt('TextPrompt'))
-            .addDialog(bookingDialog)
             .addDialog(new AuthUser(AUTH_USER))
             .addDialog(new TrocaPagamento(TROCA_PAGAMENTO))
             .addDialog(new StatusChamado(STATUS_CHAMADO))
@@ -79,13 +83,15 @@ class MainDialog extends ComponentDialog {
     }
 
     async introStep(stepContext) {
+        const userProfile = await this.userPropertyAcessor.get(stepContext.context, {});
+        const conversationData = await this.conversationDataAccessor.get(stepContext.context, { promptedForAuth: false });
         if (!this.luisRecognizer.isConfigured) {
             const messageText = 'NOTE: LUIS is not configured. To enable all capabilities, add `LuisAppId`, `LuisAPIKey` and `LuisAPIHostName` to the .env file.';
             await stepContext.context.sendActivity(messageText, null, InputHints.IgnoringInput);
             return stepContext.next();
         }
 
-        if (welcomedUserProperty) {
+        if (conversationData.promptedForAuth) {
             return stepContext.next();
         } else {
             return stepContext.beginDialog(AUTH_USER, listaUsuarios);
