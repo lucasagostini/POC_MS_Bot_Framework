@@ -54,7 +54,6 @@ class AuthUser extends ComponentDialog {
         if (typeof stepContext.result === 'number') {
             const usuario = this.userService.getUser(stepContext.result);
             if (usuario) {
-                // to do adicionar outra propriedade e jogar usuario no userstate
                 await stepContext.context.sendActivity(messagesAuth.messagesInicial.encontrei);
                 return stepContext.endDialog();
             } else {

@@ -1,6 +1,6 @@
 const messagesFluxo = {
     ticketAberto: 'Vi aqui que você já tem um chamado aberto para alterar a forma ou o prazo de pagamento dos seus pedidos:    ',
-    chamado: 'Número de protocolo do chamado :', // ${ listaUsuarios[index].ticketNumber } \n   ${ listaUsuarios[index].ticketType } \n    ${ listaUsuarios[index].ticketStat } \n    ${ listaUsuarios[index].ticketData } \n  ${ listaUsuarios[index].ticketRes }`,
+    chamado: 'Número de protocolo do chamado :',
     tipo: 'Tipo do chamado: ',
     status: ' Status: ',
     criadoEm: ' Criado em: ',

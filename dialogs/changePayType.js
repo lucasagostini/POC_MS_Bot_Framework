@@ -2,9 +2,11 @@ const { ComponentDialog, WaterfallDialog, TextPrompt } = require('botbuilder-dia
 const messagesPay = require('../bots/resources/messagesPay.js');
 const { CheckDate } = require('./checkDate.js');
 const { LuisRecognizer } = require('botbuilder-ai');
+
 const CHECK_DATE = 'checkDate';
 const CHANGE_PAY = 'changePayType';
 const TEXT_PROMPT = 'textPrompt';
+
 class ChangePayType extends ComponentDialog {
     constructor(id, userState, luisRecognizer) {
         super(id || CHANGE_PAY);
@@ -22,17 +24,12 @@ class ChangePayType extends ComponentDialog {
     }
 
     async initialStep(stepContext) {
-        // to do ler entities;
-        const cheque = false;
-        const boleto = false;
-        const dinheiro = false;
-        // .entities.cheque
-        if (cheque || boleto || dinheiro) {
-            await stepContext.context.sendActivity(messagesPay.messagesFluxo.formaInformada);
-            await stepContext.replaceDialog(CHECK_DATE);
-        } else {
-            return stepContext.prompt(TEXT_PROMPT, messagesPay.messagesFluxo.formaNaoInformada);
-        } return stepContext.endDialog();
+        // if (cheque || boleto || dinheiro) {
+        //    await stepContext.context.sendActivity(messagesPay.messagesFluxo.formaInformada);
+        //    await stepContext.replaceDialog(CHECK_DATE);
+        // } else {
+        return stepContext.prompt(TEXT_PROMPT, messagesPay.messagesFluxo.formaNaoInformada);
+        // } return stepContext.endDialog();
     }
 
     async middleStep(stepContext) {
@@ -48,7 +45,8 @@ class ChangePayType extends ComponentDialog {
                     await stepContext.context.sendActivity(messagesPay.messagesFluxo.naoCartao);
                     return stepContext.prompt(TEXT_PROMPT, messagesPay.messagesFluxo.formasValidas);
                 }
-            }
+            } // ver como lidar \/
+            return stepContext.endDialog();
         }
     }
 
