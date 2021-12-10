@@ -1,37 +1,33 @@
 const { ComponentDialog, WaterfallDialog, ConfirmPrompt, NumberPrompt } = require('botbuilder-dialogs');
-const { cpf, cnpj } = require('cpf-cnpj-validator');
 const messagesAuth = require('../bots/resources/fluxoInicial.js');
+const { UserService } = require('./userService.js');
 
 const CONFIRM_PROMPT = 'CONFIRM_PROMPT';
 const NUMBER_PROMPT = 'NUMBER_PROMPT';
 const USER_AUTH = 'authUser';
 
-let index = null;
-
 class AuthUser extends ComponentDialog {
     constructor(id) {
         super(id || USER_AUTH);
         this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT));
-        this.addDialog(new NumberPrompt(NUMBER_PROMPT)); // , this.cpfCNPJvalidator));
+        this.addDialog(new NumberPrompt(NUMBER_PROMPT));
         this.addDialog(new WaterfallDialog(USER_AUTH, [
             this.initialStep.bind(this),
             this.secondStep.bind(this),
             this.middleStep.bind(this),
-            this.afterMiddleStep.bind(this),
-            this.finalStep.bind(this)
+            this.afterMiddleStep.bind(this)
         ]));
-
+        this.userService = new UserService();
         this.initialDialogId = USER_AUTH;
     }
 
     async initialStep(stepContext) {
-        stepContext.values.listaUsuarios = stepContext.options;
         return stepContext.prompt(NUMBER_PROMPT, messagesAuth.messagesInicial.informaDoc);
     }
 
     async secondStep(stepContext) {
-        index = searchAuth(stepContext.result, stepContext.values.listaUsuarios);
-        if (index) {
+        const usuario = this.userService.getUser(stepContext.result);
+        if (usuario) {
             await stepContext.context.sendActivity(messagesAuth.messagesInicial.encontrei);
             return stepContext.endDialog();
         } else {
@@ -51,8 +47,15 @@ class AuthUser extends ComponentDialog {
 
     async afterMiddleStep(stepContext) {
         if (typeof stepContext.result === 'number') {
-            index = searchAuth(stepContext.result, stepContext.values.listaUsuarios);
-            return stepContext.next();
+            const usuario = this.userService.getUser(stepContext.result);
+            if (usuario) {
+                // to do adicionar outra propriedade e jogar usuario no userstate
+                await stepContext.context.sendActivity(messagesAuth.messagesInicial.encontrei);
+                return stepContext.endDialog();
+            } else {
+                await stepContext.context.sendActivity(messagesAuth.messagesInicial.naoEncontreiFinal);
+                return stepContext.cancelAllDialogs();
+            }
         }
         if (typeof stepContext.result === 'boolean') {
             await stepContext.context.sendActivity(messagesAuth.messagesInicial.queNoticiaBoa);
@@ -61,35 +64,7 @@ class AuthUser extends ComponentDialog {
         }
         return stepContext.cancelAllDialogs();
     }
-
-    async finalStep(stepContext) {
-        if (index) {
-            await stepContext.context.sendActivity(messagesAuth.messagesInicial.encontrei);
-            return stepContext.endDialog();
-        } else {
-            await stepContext.context.sendActivity(messagesAuth.messagesInicial.naoEncontreiFinal);
-            return stepContext.cancelAllDialogs();
-        }
-    }
-
-    async cpfCNPJvalidator(stepContext) {
-        if (cnpj.isValid(stepContext.result) || cpf.isValid(stepContext.result)) {
-            return true;
-        }
-        return false;
-    }
-}
-
-function searchAuth(documento, listaUsuarios) {
-    for (let i = 0; i < listaUsuarios.length; i++) {
-        if (listaUsuarios[i].documento === documento.toString()) {
-            return i;
-        }
-    }
-    return false;
 }
 module.exports = {
-    AuthUser,
-    searchAuth,
-    index
+    AuthUser
 };

@@ -4,56 +4,18 @@ const { ComponentDialog, DialogSet, DialogTurnStatus, TextPrompt, WaterfallDialo
 const { AuthUser } = require('./authUser.js');
 const { StatusChamado } = require('./statusChamado.js');
 const { TrocaPagamento } = require('./trocaPagamento.js');
-// const { welcomedUserProperty } = require('../bots/dialogAndWelcomeBot.js');
 
 const AUTH_USER = 'authUser';
 const MAIN_WATERFALL_DIALOG = 'mainWaterfallDialog';
 const STATUS_CHAMADO = 'statusChamado';
 const TROCA_PAGAMENTO = 'trocaPagamento';
 const NUMBER_PROMPT = 'NUMBER_PROMPT';
-const CONVERSATION_DATA_PROPERTY = 'conversationData';
-const USER_PROPERTY = 'userProperty';
-
-class Users {
-    constructor(documento, ticketData, ticketNumber, ticketType, ticketStat, ticketRes) {
-        this.documento = documento;
-        this.ticketData = ticketData;
-        this.ticketNumber = ticketNumber;
-        this.ticketType = ticketType;
-        this.ticketStat = ticketStat;
-        this.ticketRes = ticketRes;
-    }
-}
-const listaUsuarios = [
-    new Users(
-        '12345678901',
-        20211207,
-        1,
-        'Alteração de Dados',
-        'Em Andamento',
-        20211209),
-    new Users(
-        '12345678902',
-        20211205,
-        2,
-        'Alteração de Dados',
-        'Em Andamento',
-        20211207
-    ),
-    new Users(
-        '12345678903'
-    )
-];
+const WELCOMED_USER = 'welcomedUserProperty';
 
 class MainDialog extends ComponentDialog {
-    constructor(luisRecognizer, conversationState, userState) {
+    constructor(luisRecognizer, userState) {
         super('MainDialog');
-
-        this.conversationDataAccessor = conversationState.createProperty(CONVERSATION_DATA_PROPERTY);
-        this.userPropertyAcessor = userState.createProperty(USER_PROPERTY);
         this.userState = userState;
-        this.conversationState = conversationState;
-
         if (!luisRecognizer) throw new Error('[MainDialog]: Missing parameter \'luisRecognizer\' is required');
         this.luisRecognizer = luisRecognizer;
 
@@ -83,18 +45,18 @@ class MainDialog extends ComponentDialog {
     }
 
     async introStep(stepContext) {
-        const userProfile = await this.userPropertyAcessor.get(stepContext.context, {});
-        const conversationData = await this.conversationDataAccessor.get(stepContext.context, { promptedForAuth: false });
+        this.welcomedUserProperty = this.userState.createProperty(WELCOMED_USER);
+        const userData = await this.welcomedUserProperty.get(stepContext.context, { welcomedUserProperty: false });
         if (!this.luisRecognizer.isConfigured) {
             const messageText = 'NOTE: LUIS is not configured. To enable all capabilities, add `LuisAppId`, `LuisAPIKey` and `LuisAPIHostName` to the .env file.';
             await stepContext.context.sendActivity(messageText, null, InputHints.IgnoringInput);
             return stepContext.next();
         }
-
-        if (conversationData.promptedForAuth) {
+        // userData
+        if (false) {
             return stepContext.next();
         } else {
-            return stepContext.beginDialog(AUTH_USER, listaUsuarios);
+            return stepContext.beginDialog(AUTH_USER);
         }
     }
 
@@ -103,11 +65,11 @@ class MainDialog extends ComponentDialog {
         const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
         switch (LuisRecognizer.topIntent(luisResult)) {
         case 'TrocaPagamento': {
-            return stepContext.replaceDialog('trocaPagamento', listaUsuarios);
+            return stepContext.replaceDialog('trocaPagamento');
         }
 
         case 'StatusChamado': {
-            return stepContext.replaceDialog('statusChamado', listaUsuarios);
+            return stepContext.replaceDialog('statusChamado');
         }
 
         default: {
@@ -123,10 +85,10 @@ class MainDialog extends ComponentDialog {
 
     async finalStep(stepContext) {
         if (stepContext.result === 1) {
-            return stepContext.replaceDialog('trocaPagamento', listaUsuarios);
+            return stepContext.replaceDialog('trocaPagamento');
         }
         if (stepContext.result === 2) {
-            return stepContext.replaceDialog('statusChamado', listaUsuarios);
+            return stepContext.replaceDialog('statusChamado');
         }
     }
 }

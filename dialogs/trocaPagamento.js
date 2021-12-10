@@ -23,11 +23,11 @@ class TrocaPagamento extends ComponentDialog {
 
     async initialStep(stepContext) {
         // pegar intent e informações da mensagem inicial
-        stepContext.values.listaUsuarios = stepContext.options;
         return stepContext.next();
     }
 
     async ticketOpened(stepContext) {
+        // TODO consumir do user state
         const atrasado = hasTicket(stepContext.values.listaUsuarios);
         const index = 2;
         if (stepContext.values.listaUsuarios[index].ticketNumber) {
