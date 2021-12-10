@@ -2,36 +2,35 @@ const { ConfirmPrompt, ComponentDialog, WaterfallDialog } = require('botbuilder-
 const messagesPay = require('../bots/resources/messagesPay.js');
 const { ChangePayType } = require('./changePayType.js');
 // const { index } = require('./authUser.js');
-
+const { UserService } = require('./userService.js');
 const CONFIRM_PROMPT = 'confirmPrompt';
 const TROCA_PAGAMENTO = 'trocaPagamento';
 const CHANGE_PAY = 'changePayType';
 
 class TrocaPagamento extends ComponentDialog {
-    constructor(id) {
+    constructor(id, userState) {
         super(id || TROCA_PAGAMENTO);
         this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT))
-            .addDialog(new ChangePayType(CHANGE_PAY))
+            .addDialog(new ChangePayType(CHANGE_PAY, userState))
             .addDialog(new WaterfallDialog(TROCA_PAGAMENTO, [
                 this.initialStep.bind(this),
                 this.ticketOpened.bind(this),
                 this.needHelp.bind(this)
             ]));
-
+        this.userState = userState;
+        this.userService = new UserService();
         this.initialDialogId = TROCA_PAGAMENTO;
     }
 
     async initialStep(stepContext) {
-        // pegar intent e informações da mensagem inicial
         return stepContext.next();
     }
 
     async ticketOpened(stepContext) {
-        // TODO consumir do user state
-        const atrasado = hasTicket(stepContext.values.listaUsuarios);
-        const index = 2;
-        if (stepContext.values.listaUsuarios[index].ticketNumber) {
+        const ticket = this.userService.hasTicket(this.userState.usuario);
+        if (ticket) {
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.ticketAberto);
+            const atrasado = this.userService.lateTicket(this.userState.usuario);
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.chamado);
             if (atrasado) {
                 await stepContext.context.sendActivity(messagesPay.messagesFluxo.atrasado);
@@ -49,20 +48,6 @@ class TrocaPagamento extends ComponentDialog {
         }
         return stepContext.endDialog();
     }
-}
-
-function hasTicket(listaUsuarios) {
-    let atrasado = false;
-    const index = 2;
-    if (listaUsuarios[index].ticketNumber) {
-        const date = new Date();
-        const mes = date.getMonth() + 1;
-        const dia = date.getFullYear().toString() + mes.toString() + date.getDate().toString();
-        if (listaUsuarios[index].ticketRes < dia) {
-            atrasado = true;
-        }
-    }
-    return atrasado;
 }
 
 module.exports.TrocaPagamento = TrocaPagamento;

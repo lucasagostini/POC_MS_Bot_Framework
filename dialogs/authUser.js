@@ -7,7 +7,7 @@ const NUMBER_PROMPT = 'NUMBER_PROMPT';
 const USER_AUTH = 'authUser';
 
 class AuthUser extends ComponentDialog {
-    constructor(id) {
+    constructor(id, userState) {
         super(id || USER_AUTH);
         this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT));
         this.addDialog(new NumberPrompt(NUMBER_PROMPT));
@@ -17,6 +17,7 @@ class AuthUser extends ComponentDialog {
             this.middleStep.bind(this),
             this.afterMiddleStep.bind(this)
         ]));
+        this.userState = userState;
         this.userService = new UserService();
         this.initialDialogId = USER_AUTH;
     }
@@ -27,7 +28,10 @@ class AuthUser extends ComponentDialog {
 
     async secondStep(stepContext) {
         const usuario = this.userService.getUser(stepContext.result);
+        this.usuario = this.userState.createProperty('usuario');
         if (usuario) {
+            await this.usuario.set(stepContext.context, this.userService.getUser(stepContext.result));
+            await this.userState.saveChanges(stepContext.context);
             await stepContext.context.sendActivity(messagesAuth.messagesInicial.encontrei);
             return stepContext.endDialog();
         } else {

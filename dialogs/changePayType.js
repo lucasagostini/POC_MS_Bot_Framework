@@ -4,13 +4,13 @@ const { CheckDate } = require('./checkDate.js');
 const CHECK_DATE = 'checkDate';
 const CHANGE_PAY = 'changePayType';
 class ChangePayType extends ComponentDialog {
-    constructor(id) {
+    constructor(id, userState) {
         super(id || CHANGE_PAY);
-        this.addDialog(new CheckDate(CHECK_DATE))
+        this.addDialog(new CheckDate(CHECK_DATE, userState))
             .addDialog(new WaterfallDialog(CHANGE_PAY, [
                 this.initialStep.bind(this)
             ]));
-
+        this.userState = userState;
         this.initialDialogId = CHANGE_PAY;
     }
 

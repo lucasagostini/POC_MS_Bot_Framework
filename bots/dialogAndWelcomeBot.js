@@ -10,11 +10,8 @@ class DialogAndWelcomeBot extends DialogBot {
 
         this.onMembersAdded(async (context, next) => {
             const didBotWelcomedUser = await this.welcomedUserProperty.get(context, false);
-
             if (!didBotWelcomedUser) {
                 await context.sendActivity(WelcomeCard.welcomeMessages.welcomeMessage);
-                await this.welcomedUserProperty.set(context, true);
-                await userState.saveChanges(context);
             } else {
                 await context.sendActivity(WelcomeCard.welcomeMessages.ola);
             }

@@ -37,6 +37,27 @@ class UserService {
         usuario.ticketRes = 20211211;
         usuario.ticketStat = 'Aberto';
         usuario.ticketType = 'Chamado';
+        return usuario.ticketNumber;
+    }
+
+    lateTicket(usuario) {
+        let atrasado = false;
+        if (usuario.ticketNumber) {
+            const date = new Date();
+            const mes = date.getMonth() + 1;
+            const dia = date.getFullYear().toString() + mes.toString() + date.getDate().toString();
+            if (usuario.ticketRes < dia) {
+                atrasado = true;
+            }
+        }
+        return atrasado;
+    }
+
+    hasTicket(usuario) {
+        if (usuario.ticketNumber) {
+            return true;
+        }
+        return false;
     }
 }
 

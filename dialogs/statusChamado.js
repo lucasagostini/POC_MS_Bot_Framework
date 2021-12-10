@@ -4,12 +4,12 @@ const { WaterfallDialog, ComponentDialog } = require('botbuilder-dialogs');
 
 const STATUS_CHAMADO = 'statusChamado';
 class StatusChamado extends ComponentDialog {
-    constructor(id) {
+    constructor(id, userState) {
         super(id || STATUS_CHAMADO);
         this.addDialog(new WaterfallDialog(STATUS_CHAMADO, [
             this.initialStep.bind(this)
         ]));
-
+        this.userState = userState;
         this.initialDialogId = STATUS_CHAMADO;
     }
 

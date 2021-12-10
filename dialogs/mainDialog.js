@@ -1,5 +1,5 @@
 const { InputHints } = require('botbuilder');
-const { LuisRecognizer } = require('botbuilder-ai');
+// const { LuisRecognizer } = require('botbuilder-ai');
 const { ComponentDialog, DialogSet, DialogTurnStatus, TextPrompt, WaterfallDialog, NumberPrompt } = require('botbuilder-dialogs');
 const { AuthUser } = require('./authUser.js');
 const { StatusChamado } = require('./statusChamado.js');
@@ -21,9 +21,9 @@ class MainDialog extends ComponentDialog {
 
         this.addDialog(new NumberPrompt(NUMBER_PROMPT))
             .addDialog(new TextPrompt('TextPrompt'))
-            .addDialog(new AuthUser(AUTH_USER))
-            .addDialog(new TrocaPagamento(TROCA_PAGAMENTO))
-            .addDialog(new StatusChamado(STATUS_CHAMADO))
+            .addDialog(new AuthUser(AUTH_USER, userState))
+            .addDialog(new TrocaPagamento(TROCA_PAGAMENTO, userState))
+            .addDialog(new StatusChamado(STATUS_CHAMADO, userState))
             .addDialog(new WaterfallDialog(MAIN_WATERFALL_DIALOG, [
                 this.introStep.bind(this),
                 this.actStep.bind(this),
@@ -52,18 +52,19 @@ class MainDialog extends ComponentDialog {
             await stepContext.context.sendActivity(messageText, null, InputHints.IgnoringInput);
             return stepContext.next();
         }
-        // userData
-        if (false) {
+        if (userData) {
             return stepContext.next();
         } else {
+            await this.welcomedUserProperty.set(stepContext.context, true);
+            await this.userState.saveChanges(stepContext.context);
             return stepContext.beginDialog(AUTH_USER);
         }
     }
 
     async actStep(stepContext) {
         // como salvar pra usar no changepaytype
-        const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
-        switch (LuisRecognizer.topIntent(luisResult)) {
+        // const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
+        /* switch (stepContext.result) { // LuisRecognizer.topIntent(luisResult)) {
         case 'TrocaPagamento': {
             return stepContext.replaceDialog('trocaPagamento');
         }
@@ -72,15 +73,15 @@ class MainDialog extends ComponentDialog {
             return stepContext.replaceDialog('statusChamado');
         }
 
-        default: {
-            // Catch all for unhandled intents
-            const didntUnderstandMessageText = `Como posso te ajudar?
+        default: { */
+        // Catch all for unhandled intents
+        const didntUnderstandMessageText = `Como posso te ajudar?
 
-            1 - Mudar forma de pagamento
-            2 - Consultar o status de um chamado (intent was ${ LuisRecognizer.topIntent(luisResult) })`;
-            return stepContext.prompt(NUMBER_PROMPT, didntUnderstandMessageText, ['1', '2']);
-        }
-        }
+        1 - Mudar forma de pagamento
+        2 - Consultar o status de um chamado`;
+        return stepContext.prompt(NUMBER_PROMPT, didntUnderstandMessageText);
+        /* }
+        } */
     }
 
     async finalStep(stepContext) {
