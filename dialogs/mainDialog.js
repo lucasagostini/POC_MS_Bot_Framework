@@ -5,12 +5,14 @@ const { AuthUser } = require('./authUser.js');
 const { StatusChamado } = require('./statusChamado.js');
 const { TrocaPagamento } = require('./trocaPagamento.js');
 const msgs = require('../bots/resources/welcomecard.js');
+
 const AUTH_USER = 'authUser';
 const MAIN_WATERFALL_DIALOG = 'mainWaterfallDialog';
 const STATUS_CHAMADO = 'statusChamado';
 const TROCA_PAGAMENTO = 'trocaPagamento';
 const NUMBER_PROMPT = 'NUMBER_PROMPT';
 const WELCOMED_USER = 'welcomedUserProperty';
+const TEXT_PROMPT = 'TextPrompt';
 
 class MainDialog extends ComponentDialog {
     constructor(luisRecognizer, userState) {
@@ -20,7 +22,7 @@ class MainDialog extends ComponentDialog {
         this.luisRecognizer = luisRecognizer;
 
         this.addDialog(new NumberPrompt(NUMBER_PROMPT))
-            .addDialog(new TextPrompt('TextPrompt'))
+            .addDialog(new TextPrompt(TEXT_PROMPT))
             .addDialog(new AuthUser(AUTH_USER, userState, luisRecognizer))
             .addDialog(new TrocaPagamento(TROCA_PAGAMENTO, userState, luisRecognizer))
             .addDialog(new StatusChamado(STATUS_CHAMADO, userState, luisRecognizer))
@@ -74,17 +76,30 @@ class MainDialog extends ComponentDialog {
         }
 
         default: {
-            return stepContext.prompt(NUMBER_PROMPT, msgs.welcomeMessages.didntUnderstandMessageText);
+            return stepContext.prompt(TEXT_PROMPT, msgs.welcomeMessages.didntUnderstandMessageText);
         }
         }
     }
 
     async finalStep(stepContext) {
-        if (stepContext.result === 1) {
+        const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
+        switch (LuisRecognizer.topIntent(luisResult)) {
+        case 'TrocaPagamento': {
             return stepContext.replaceDialog('trocaPagamento');
         }
-        if (stepContext.result === 2) {
+
+        case 'StatusChamado': {
             return stepContext.replaceDialog('statusChamado');
+        }
+        default: {
+            if (stepContext.result === '1') {
+                return stepContext.replaceDialog('trocaPagamento');
+            }
+            if (stepContext.result === '2') {
+                return stepContext.replaceDialog('statusChamado');
+            }
+            return stepContext.endDialog();
+        }
         }
     }
 }

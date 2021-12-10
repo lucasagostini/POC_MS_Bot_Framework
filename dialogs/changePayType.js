@@ -1,6 +1,7 @@
 const { ComponentDialog, WaterfallDialog, TextPrompt } = require('botbuilder-dialogs');
 const messagesPay = require('../bots/resources/messagesPay.js');
 const { CheckDate } = require('./checkDate.js');
+const { LuisRecognizer } = require('botbuilder-ai');
 const CHECK_DATE = 'checkDate';
 const CHANGE_PAY = 'changePayType';
 const TEXT_PROMPT = 'textPrompt';
@@ -12,6 +13,7 @@ class ChangePayType extends ComponentDialog {
             .addDialog(new WaterfallDialog(CHANGE_PAY, [
                 this.initialStep.bind(this),
                 this.middleStep.bind(this),
+                this.afterMiddle.bind(this),
                 this.finalStep.bind(this)
             ]));
         this.userState = userState;
@@ -34,6 +36,23 @@ class ChangePayType extends ComponentDialog {
     }
 
     async middleStep(stepContext) {
+        const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.result);
+        if (LuisRecognizer.topIntent(luisResult) === 'PrazoPagamento') {
+            await stepContext.context.sendActivity(messagesPay.messagesFluxo.okMas);
+            return stepContext.prompt(TEXT_PROMPT, messagesPay.messagesFluxo.formaNaoInformada);
+        } else {
+            if (luisResult.entities.boleto || luisResult.entities.cheque || luisResult.entities.dinheiro) {
+                return stepContext.replaceDialog(CHECK_DATE);
+            } else {
+                if (luisResult.entities.cartao) {
+                    await stepContext.context.sendActivity(messagesPay.messagesFluxo.naoCartao);
+                    return stepContext.prompt(TEXT_PROMPT, messagesPay.messagesFluxo.formasValidas);
+                }
+            }
+        }
+    }
+
+    async afterMiddle(stepContext) {
         const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.result);
         if (luisResult.entities.boleto || luisResult.entities.cheque || luisResult.entities.dinheiro) {
             return stepContext.replaceDialog(CHECK_DATE);

@@ -24,7 +24,9 @@ const messagesFluxo = {
     prazoInvalido: 'Você pode pedir até 7 dias para pagar seus pedidos. Por favor, me informe o prazo desejado.    ',
     prazoImpossivel: 'Esse realmente não é um prazo possível 😕',
     naoAbriuChamado: 'Desculpe, houve um problema ao abrir seu chamado. Tente novamente mais tarde!',
-    abriuChamado: 'Pronto, aqui está o número do seu chamado: ',
-    prazoChamado: ' O prazo para que a gente avalie sua solicitação é de até 2 dias úteis.'
+    abriuChamado: `Pronto, aqui está o número do seu chamado:  
+    O prazo para que a gente avalie sua solicitação é de até 2 dias úteis.`,
+    okMas: `Ok, podemos resolver isso 👍 
+    Mas antes preciso confirmar uma informação: `
 };
 module.exports.messagesFluxo = messagesFluxo;
