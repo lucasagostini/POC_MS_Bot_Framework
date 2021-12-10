@@ -27,10 +27,12 @@ class TrocaPagamento extends ComponentDialog {
     }
 
     async ticketOpened(stepContext) {
-        const ticket = this.userService.hasTicket(this.userState.usuario);
+        this.usuario = this.userState.createProperty('usuario');
+        const userData = await this.usuario.get(stepContext.context, { usuario: null });
+        const ticket = this.userService.hasTicket(userData);
         if (ticket) {
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.ticketAberto);
-            const atrasado = this.userService.lateTicket(this.userState.usuario);
+            const atrasado = this.userService.lateTicket(userData);
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.chamado);
             if (atrasado) {
                 await stepContext.context.sendActivity(messagesPay.messagesFluxo.atrasado);

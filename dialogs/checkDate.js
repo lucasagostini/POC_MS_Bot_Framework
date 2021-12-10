@@ -21,12 +21,7 @@ class CheckDate extends ComponentDialog {
     }
 
     async initialStep(stepContext) {
-        const data = false;
-        if (data) {
-            return stepContext.replaceDialog(TO_OPEN_TICKET);
-        } else {
-            return stepContext.prompt(NUMBER_PROMPT, messagesPay.messagesFluxo.qualPrazo);
-        }
+        return stepContext.prompt(NUMBER_PROMPT, messagesPay.messagesFluxo.qualPrazo);
     }
 
     async middleStep(stepContext) {

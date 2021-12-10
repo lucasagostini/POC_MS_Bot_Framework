@@ -16,8 +16,10 @@ class ToOpenTicket extends ComponentDialog {
 
     async initialStep(stepContext) {
         await stepContext.context.sendActivity(messagesPay.messagesFluxo.abrindoChamado);
-        // abrirTicket(usuario do userstate)
-        if (this.userService.addTicket()) {
+        this.usuario = this.userState.createProperty('usuario');
+        const userData = await this.usuario.get(stepContext.context, { usuario: null });
+        const ticketAdded = this.userService.addTicket(userData);
+        if (ticketAdded) {
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.abriuChamado);
         } else {
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.naoAbriuChamado);
