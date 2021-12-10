@@ -36,7 +36,7 @@ class UserService {
         usuario.ticketNumber = 12;
         usuario.ticketRes = 20211211;
         usuario.ticketStat = 'Aberto';
-        usuario.ticketType = 'Chamado';
+        usuario.ticketType = 'Troca de Pagamento';
         return usuario.ticketNumber;
     }
 

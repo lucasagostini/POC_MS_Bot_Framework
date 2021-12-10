@@ -4,7 +4,7 @@ const { ComponentDialog, DialogSet, DialogTurnStatus, TextPrompt, WaterfallDialo
 const { AuthUser } = require('./authUser.js');
 const { StatusChamado } = require('./statusChamado.js');
 const { TrocaPagamento } = require('./trocaPagamento.js');
-
+const msgs = require('../bots/resources/welcomecard.js');
 const AUTH_USER = 'authUser';
 const MAIN_WATERFALL_DIALOG = 'mainWaterfallDialog';
 const STATUS_CHAMADO = 'statusChamado';
@@ -21,9 +21,9 @@ class MainDialog extends ComponentDialog {
 
         this.addDialog(new NumberPrompt(NUMBER_PROMPT))
             .addDialog(new TextPrompt('TextPrompt'))
-            .addDialog(new AuthUser(AUTH_USER, userState))
-            .addDialog(new TrocaPagamento(TROCA_PAGAMENTO, userState))
-            .addDialog(new StatusChamado(STATUS_CHAMADO, userState))
+            .addDialog(new AuthUser(AUTH_USER, userState, luisRecognizer))
+            .addDialog(new TrocaPagamento(TROCA_PAGAMENTO, userState, luisRecognizer))
+            .addDialog(new StatusChamado(STATUS_CHAMADO, userState, luisRecognizer))
             .addDialog(new WaterfallDialog(MAIN_WATERFALL_DIALOG, [
                 this.introStep.bind(this),
                 this.actStep.bind(this),
@@ -74,12 +74,7 @@ class MainDialog extends ComponentDialog {
         }
 
         default: {
-        // Catch all for unhandled intents
-            const didntUnderstandMessageText = `Como posso te ajudar?
-
-            1 - Mudar forma de pagamento
-            2 - Consultar o status de um chamado`;
-            return stepContext.prompt(NUMBER_PROMPT, didntUnderstandMessageText);
+            return stepContext.prompt(NUMBER_PROMPT, msgs.welcomeMessages.didntUnderstandMessageText);
         }
         }
     }

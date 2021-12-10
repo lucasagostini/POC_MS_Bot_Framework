@@ -7,7 +7,7 @@ const NUMBER_PROMPT = 'NUMBER_PROMPT';
 const USER_AUTH = 'authUser';
 
 class AuthUser extends ComponentDialog {
-    constructor(id, userState) {
+    constructor(id, userState, luisRecognizer) {
         super(id || USER_AUTH);
         this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT));
         this.addDialog(new NumberPrompt(NUMBER_PROMPT));
@@ -18,6 +18,7 @@ class AuthUser extends ComponentDialog {
             this.afterMiddleStep.bind(this)
         ]));
         this.userState = userState;
+        this.luisRecognizer = luisRecognizer;
         this.userService = new UserService();
         this.initialDialogId = USER_AUTH;
     }

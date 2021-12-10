@@ -7,9 +7,9 @@ const TO_OPEN_TICKET = 'toOpenTicket';
 const CHECK_DATE = 'checkDate';
 
 class CheckDate extends ComponentDialog {
-    constructor(id, userState) {
+    constructor(id, userState, luisRecognizer) {
         super(id || CHECK_DATE);
-        this.addDialog(new ToOpenTicket(TO_OPEN_TICKET, userState))
+        this.addDialog(new ToOpenTicket(TO_OPEN_TICKET, userState, luisRecognizer))
             .addDialog(new NumberPrompt(NUMBER_PROMPT))
             .addDialog(new WaterfallDialog(CHECK_DATE, [
                 this.initialStep.bind(this),
@@ -17,6 +17,7 @@ class CheckDate extends ComponentDialog {
                 this.finalStep.bind(this)
             ]));
         this.userState = userState;
+        this.luisRecognizer = luisRecognizer;
         this.initialDialogId = CHECK_DATE;
     }
 

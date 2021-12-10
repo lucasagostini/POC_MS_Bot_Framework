@@ -5,9 +5,9 @@ const CHECK_DATE = 'checkDate';
 const CHANGE_PAY = 'changePayType';
 const TEXT_PROMPT = 'textPrompt';
 class ChangePayType extends ComponentDialog {
-    constructor(id, userState) {
+    constructor(id, userState, luisRecognizer) {
         super(id || CHANGE_PAY);
-        this.addDialog(new CheckDate(CHECK_DATE, userState))
+        this.addDialog(new CheckDate(CHECK_DATE, userState, luisRecognizer))
             .addDialog(new TextPrompt(TEXT_PROMPT))
             .addDialog(new WaterfallDialog(CHANGE_PAY, [
                 this.initialStep.bind(this),
@@ -15,6 +15,7 @@ class ChangePayType extends ComponentDialog {
                 this.finalStep.bind(this)
             ]));
         this.userState = userState;
+        this.luisRecognizer = luisRecognizer;
         this.initialDialogId = CHANGE_PAY;
     }
 
@@ -28,30 +29,29 @@ class ChangePayType extends ComponentDialog {
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.formaInformada);
             await stepContext.replaceDialog(CHECK_DATE);
         } else {
-            return stepContext.prompt(TEXT_PROMPT, messagesPay.messagesFluxo.formaNaoInformada, ['Cheque', 'Dinheiro', 'Boleto']);
+            return stepContext.prompt(TEXT_PROMPT, messagesPay.messagesFluxo.formaNaoInformada);
         } return stepContext.endDialog();
     }
 
     async middleStep(stepContext) {
-        const formaPagamento = stepContext.result;
-        if (formaPagamento === 'cheque' || formaPagamento === 'boleto' || formaPagamento === 'dinheiro') {
-            await stepContext.replaceDialog(CHECK_DATE);
+        const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.result);
+        if (luisResult.entities.boleto || luisResult.entities.cheque || luisResult.entities.dinheiro) {
+            return stepContext.replaceDialog(CHECK_DATE);
         } else {
-            if (formaPagamento === 'cartao') {
+            if (luisResult.entities.cartao) {
                 await stepContext.context.sendActivity(messagesPay.messagesFluxo.naoCartao);
-                return stepContext.prompt(TEXT_PROMPT, messagesPay.messagesFluxo.formasValidas, ['Cheque', 'Dinheiro', 'Boleto']);
+                return stepContext.prompt(TEXT_PROMPT, messagesPay.messagesFluxo.formasValidas);
             }
         }
     }
 
     async finalStep(stepContext) {
-        const formaPagamento = stepContext.result;
-        if (formaPagamento === 'cartao') {
+        const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.result);
+        if (luisResult.entities.boleto || luisResult.entities.cheque || luisResult.entities.dinheiro) {
+            return stepContext.replaceDialog(CHECK_DATE);
+        } else if (luisResult.entities.cartao) {
             await stepContext.context.sendActivity(messagesPay.messagesFluxo.naoNaoCartao);
             return stepContext.cancelAllDialogs();
-        }
-        if (formaPagamento === 'cheque' || formaPagamento === 'boleto' || formaPagamento === 'dinheiro') {
-            return stepContext.replaceDialog(CHECK_DATE);
         }
     }
 }
