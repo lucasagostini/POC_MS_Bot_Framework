@@ -1,3 +1,4 @@
+// const Math = require('math');
 class UserService {
     constructor() {
         this.listaUsuarios = [
@@ -32,9 +33,14 @@ class UserService {
     }
 
     addTicket(usuario) {
-        usuario.ticketData = 20211209;
-        usuario.ticketNumber = 12;
-        usuario.ticketRes = 20211211;
+        const date = new Date();
+        const mes = date.getMonth() + 1;
+        const res = date.getDate() + 2;
+        const ticketData = date.getFullYear().toString() + mes.toString() + date.getDate().toString();
+        const ticketRes = date.getFullYear().toString() + mes.toString() + res.toString();
+        usuario.ticketData = ticketData;
+        usuario.ticketNumber = ticketData + Math.floor(Math.random() * (25 - 1) + 1).toString();
+        usuario.ticketRes = ticketRes;
         usuario.ticketStat = 'Aberto';
         usuario.ticketType = 'Troca de Pagamento';
         return usuario.ticketNumber;
