@@ -11,7 +11,7 @@ class AuthUser extends ComponentDialog {
     constructor(id, userState, luisRecognizer) {
         super(id || USER_AUTH);
         this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT));
-        this.addDialog(new NumberPrompt(NUMBER_PROMPT), documentValidator);
+        this.addDialog(new NumberPrompt(NUMBER_PROMPT), this.documentValidator);
         this.addDialog(new WaterfallDialog(USER_AUTH, [
             this.initialStep.bind(this),
             this.secondStep.bind(this),
@@ -54,12 +54,15 @@ class AuthUser extends ComponentDialog {
     async afterMiddleStep(stepContext) {
         if (typeof stepContext.result === 'number') {
             const usuario = this.userService.getUser(stepContext.result);
+            this.usuario = this.userState.createProperty('usuario');
             if (usuario) {
+                await this.usuario.set(stepContext.context, this.userService.getUser(stepContext.result));
+                await this.userState.saveChanges(stepContext.context);
                 await stepContext.context.sendActivity(messagesAuth.messagesInicial.encontrei);
                 return stepContext.endDialog();
             } else {
                 await stepContext.context.sendActivity(messagesAuth.messagesInicial.naoEncontreiFinal);
-                return stepContext.cancelAllDialogs();
+                return stepContext.cancelAllDialogs({ cancelParents: true });
             }
         }
         if (typeof stepContext.result === 'boolean') {
@@ -67,17 +70,18 @@ class AuthUser extends ComponentDialog {
         } else {
             await stepContext.context.sendActivity(messagesAuth.messagesInicial.quePena);
         }
-        return stepContext.cancelAllDialogs();
+        return stepContext.cancelAllDialogs({ cancelParents: true });
+    }
+
+    async documentValidator() {
+        if (cpf.isValid(document) || cnpj.isValid(document)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 
-function documentValidator(document) {
-    if (cpf.isValid(document) || cnpj.isValid(document)) {
-        return true;
-    } else {
-        return false;
-    }
-}
 module.exports = {
     AuthUser
 };

@@ -1,5 +1,5 @@
 const { ConfirmPrompt, ComponentDialog, WaterfallDialog } = require('botbuilder-dialogs');
-const { messagesPay, msgTicket } = require('../bots/resources/messagesPay.js');
+const { messagesFluxo, msgTicket } = require('../bots/resources/messagesPay.js');
 const { ChangePayType } = require('./changePayType.js');
 const { UserService } = require('../services/userService.js');
 const { TicketService } = require('../services/ticketService.js');
@@ -14,7 +14,6 @@ class TrocaPagamento extends ComponentDialog {
         this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT))
             .addDialog(new ChangePayType(CHANGE_PAY, userState, luisRecognizer))
             .addDialog(new WaterfallDialog(TROCA_PAGAMENTO, [
-                this.initialStep.bind(this),
                 this.ticketOpened.bind(this),
                 this.needHelp.bind(this)
             ]));
@@ -25,12 +24,8 @@ class TrocaPagamento extends ComponentDialog {
         this.initialDialogId = TROCA_PAGAMENTO;
     }
 
-    async initialStep(stepContext) {
-        return stepContext.next();
-    }
-
     async ticketOpened(stepContext) {
-        const msg = messagesPay.messagesFluxo;
+        const msg = messagesFluxo.messagesFluxo;
         this.usuario = this.userState.createProperty('usuario');
         const userData = await this.usuario.get(stepContext.context, { usuario: null });
         const ticket = this.ticketService.hasTicket(userData);
@@ -49,9 +44,9 @@ class TrocaPagamento extends ComponentDialog {
 
     async needHelp(stepContext) {
         if (stepContext.result) {
-            await stepContext.context.sendActivity(messagesPay.messagesFluxo.resolverSolicitacao);
+            await stepContext.context.sendActivity(messagesFluxo.messagesFluxo.resolverSolicitacao);
         } else {
-            await stepContext.context.sendActivity(messagesPay.messagesFluxo.tudoBem);
+            await stepContext.context.sendActivity(messagesFluxo.messagesFluxo.tudoBem);
         }
         return stepContext.endDialog();
     }

@@ -24,11 +24,10 @@ class UserService {
     // nao funcionando e não sei pq
 
     getUser(document) {
-        this.listaUsuarios.find(elem => {
-            if (elem.document === document) {
-                return elem;
-            }
+        const elemento = this.listaUsuarios.find(elem => {
+            return elem.documento === document.toString();
         });
+        return elemento;
     }
 }
 

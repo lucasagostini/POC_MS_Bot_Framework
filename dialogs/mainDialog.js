@@ -54,17 +54,23 @@ class MainDialog extends ComponentDialog {
             await stepContext.context.sendActivity(messageText, null, InputHints.IgnoringInput);
             return stepContext.next();
         }
-        if (userData) {
-            return stepContext.next();
-        } else {
+        if (!userData) {
+            await stepContext.context.sendActivity(msgs.welcomeMessages.welcomeMessage);
             await this.welcomedUserProperty.set(stepContext.context, true);
             await this.userState.saveChanges(stepContext.context);
             return stepContext.beginDialog(AUTH_USER);
+        } else {
+            await stepContext.context.sendActivity(msgs.welcomeMessages.ola);
+            return stepContext.next();
         }
     }
 
     async actStep(stepContext) {
-        // como salvar pra usar no changepaytype
+        // this.usuario = this.userState.createProperty('usuario');
+        // const autenticado = this.usuario.get(stepContext.context, false);
+        // if (!autenticado) {
+        //     return stepContext.cancelAllDialogs();
+        // }
         const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
         if (luisResult.entities.Number) {
             if (luisResult.entities.Number === 1) {
