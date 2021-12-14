@@ -1,7 +1,9 @@
 const { ConfirmPrompt, ComponentDialog, WaterfallDialog } = require('botbuilder-dialogs');
-const messagesPay = require('../bots/resources/messagesPay.js');
+const { messagesPay, msgTicket } = require('../bots/resources/messagesPay.js');
 const { ChangePayType } = require('./changePayType.js');
-const { UserService } = require('./userService.js');
+const { UserService } = require('../services/userService.js');
+const { TicketService } = require('../services/ticketService.js');
+
 const CONFIRM_PROMPT = 'confirmPrompt';
 const TROCA_PAGAMENTO = 'trocaPagamento';
 const CHANGE_PAY = 'changePayType';
@@ -17,6 +19,7 @@ class TrocaPagamento extends ComponentDialog {
                 this.needHelp.bind(this)
             ]));
         this.userState = userState;
+        this.ticketService = new TicketService();
         this.luisRecognizer = luisRecognizer;
         this.userService = new UserService();
         this.initialDialogId = TROCA_PAGAMENTO;
@@ -30,15 +33,11 @@ class TrocaPagamento extends ComponentDialog {
         const msg = messagesPay.messagesFluxo;
         this.usuario = this.userState.createProperty('usuario');
         const userData = await this.usuario.get(stepContext.context, { usuario: null });
-        const ticket = this.userService.hasTicket(userData);
+        const ticket = this.ticketService.hasTicket(userData);
         if (ticket) {
             await stepContext.context.sendActivity(msg.ticketAberto);
-            const atrasado = this.userService.lateTicket(userData);
-            await stepContext.context.sendActivity(msg.chamado + userData.ticketData.toString() + ' - ' +
-                                                   msg.tipo + userData.ticketType + ' - ' +
-                                                   msg.status + userData.ticketStat + ' - ' +
-                                                   msg.criadoEm + userData.ticketData.toString() + ' - ' +
-                                                   msg.resolu + userData.ticketRes.toString());
+            const atrasado = this.ticketService.lateTicket(userData);
+            await stepContext.context.sendActivity(msgTicket());
 
             if (atrasado) {
                 await stepContext.context.sendActivity(msg.atrasado);

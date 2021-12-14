@@ -1,6 +1,7 @@
 const { ComponentDialog, WaterfallDialog, ConfirmPrompt, NumberPrompt } = require('botbuilder-dialogs');
 const messagesAuth = require('../bots/resources/fluxoInicial.js');
-const { UserService } = require('./userService.js');
+const { UserService } = require('../services/userService.js');
+const { cpf, cnpj } = require('cpf-cnpj-validator');
 
 const CONFIRM_PROMPT = 'CONFIRM_PROMPT';
 const NUMBER_PROMPT = 'NUMBER_PROMPT';
@@ -10,7 +11,7 @@ class AuthUser extends ComponentDialog {
     constructor(id, userState, luisRecognizer) {
         super(id || USER_AUTH);
         this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT));
-        this.addDialog(new NumberPrompt(NUMBER_PROMPT));
+        this.addDialog(new NumberPrompt(NUMBER_PROMPT), documentValidator);
         this.addDialog(new WaterfallDialog(USER_AUTH, [
             this.initialStep.bind(this),
             this.secondStep.bind(this),
@@ -67,6 +68,14 @@ class AuthUser extends ComponentDialog {
             await stepContext.context.sendActivity(messagesAuth.messagesInicial.quePena);
         }
         return stepContext.cancelAllDialogs();
+    }
+}
+
+function documentValidator(document) {
+    if (cpf.isValid(document) || cnpj.isValid(document)) {
+        return true;
+    } else {
+        return false;
     }
 }
 module.exports = {

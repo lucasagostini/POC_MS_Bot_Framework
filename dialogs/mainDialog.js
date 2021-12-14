@@ -66,10 +66,12 @@ class MainDialog extends ComponentDialog {
     async actStep(stepContext) {
         // como salvar pra usar no changepaytype
         const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
-        if (stepContext.context === '1') {
-            return stepContext.replaceDialog('trocaPagamento');
-        } else if (stepContext.context === '2') {
-            return stepContext.replaceDialog('statusChamado');
+        if (luisResult.entities.Number) {
+            if (luisResult.entities.Number === 1) {
+                return stepContext.replaceDialog('trocaPagamento');
+            } else if (luisResult.entities.Number === 2) {
+                return stepContext.replaceDialog('statusChamado');
+            }
         } else {
             switch (LuisRecognizer.topIntent(luisResult)) {
             case 'TrocaPagamento': {
@@ -89,10 +91,12 @@ class MainDialog extends ComponentDialog {
 
     async finalStep(stepContext) {
         const luisResult = await this.luisRecognizer.executeLuisQuery(stepContext.context);
-        if (stepContext.context === '1') {
-            return stepContext.replaceDialog('trocaPagamento');
-        } else if (stepContext.context === '2') {
-            return stepContext.replaceDialog('statusChamado');
+        if (luisResult.entities.Number) {
+            if (luisResult.entities.Number === 1) {
+                return stepContext.replaceDialog('trocaPagamento');
+            } else if (luisResult.entities.Number === 2) {
+                return stepContext.replaceDialog('statusChamado');
+            }
         } else {
             switch (LuisRecognizer.topIntent(luisResult)) {
             case 'TrocaPagamento': {
@@ -102,14 +106,9 @@ class MainDialog extends ComponentDialog {
             case 'StatusChamado': {
                 return stepContext.replaceDialog('statusChamado');
             }
+
             default: {
-                if (stepContext.result === '1') {
-                    return stepContext.replaceDialog('trocaPagamento');
-                }
-                if (stepContext.result === '2') {
-                    return stepContext.replaceDialog('statusChamado');
-                }
-                return stepContext.endDialog();
+                return stepContext.cancelAllDialogs();
             }
             }
         }

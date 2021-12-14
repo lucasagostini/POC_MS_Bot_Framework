@@ -29,4 +29,22 @@ const messagesFluxo = {
     okMas: `Ok, podemos resolver isso 👍 
     Mas antes preciso confirmar uma informação: `
 };
-module.exports.messagesFluxo = messagesFluxo;
+function msgTicket(userData) {
+    const msg = (messagesFluxo.chamado + dataConverter(userData.ticketData) + ' - ' +
+    messagesFluxo.tipo + userData.ticketType + ' - ' +
+    messagesFluxo.status + userData.ticketStat + ' - ' +
+    messagesFluxo.criadoEm + dataConverter(userData.ticketData) + ' - ' +
+    messagesFluxo.resolu + dataConverter(userData.ticketRes));
+    return msg;
+}
+function dataConverter(data) {
+    const dataString = data.toString();
+    const ano = dataString.substring(0, 4);
+    const mes = dataString.substring(4, 6);
+    const dia = dataString.substring(6);
+    return (dia + '/' + mes + '/' + ano);
+}
+module.exports = {
+    messagesFluxo,
+    msgTicket
+};
