@@ -25,14 +25,14 @@ class TrocaPagamento extends ComponentDialog {
     }
 
     async ticketOpened(stepContext) {
-        const msg = messagesFluxo.messagesFluxo;
+        const msg = messagesFluxo;
         this.usuario = this.userState.createProperty('usuario');
         const userData = await this.usuario.get(stepContext.context, { usuario: null });
         const ticket = this.ticketService.hasTicket(userData);
         if (ticket) {
             await stepContext.context.sendActivity(msg.ticketAberto);
             const atrasado = this.ticketService.lateTicket(userData);
-            await stepContext.context.sendActivity(msgTicket());
+            await stepContext.context.sendActivity(msgTicket(userData));
 
             if (atrasado) {
                 await stepContext.context.sendActivity(msg.atrasado);
@@ -44,9 +44,9 @@ class TrocaPagamento extends ComponentDialog {
 
     async needHelp(stepContext) {
         if (stepContext.result) {
-            await stepContext.context.sendActivity(messagesFluxo.messagesFluxo.resolverSolicitacao);
+            await stepContext.context.sendActivity(messagesFluxo.resolverSolicitacao);
         } else {
-            await stepContext.context.sendActivity(messagesFluxo.messagesFluxo.tudoBem);
+            await stepContext.context.sendActivity(messagesFluxo.tudoBem);
         }
         return stepContext.endDialog();
     }

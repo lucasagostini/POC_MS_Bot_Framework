@@ -30,7 +30,7 @@ const messagesFluxo = {
     Mas antes preciso confirmar uma informação: `
 };
 function msgTicket(userData) {
-    const msg = (messagesFluxo.chamado + dataConverter(userData.ticketData) + ' - ' +
+    const msg = (messagesFluxo.chamado + userData.ticketData.toString() + ' - ' +
     messagesFluxo.tipo + userData.ticketType + ' - ' +
     messagesFluxo.status + userData.ticketStat + ' - ' +
     messagesFluxo.criadoEm + dataConverter(userData.ticketData) + ' - ' +
