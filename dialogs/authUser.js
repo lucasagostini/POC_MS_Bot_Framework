@@ -11,7 +11,7 @@ class AuthUser extends ComponentDialog {
     constructor(id, userState, luisRecognizer) {
         super(id || USER_AUTH);
         this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT));
-        this.addDialog(new NumberPrompt(NUMBER_PROMPT), this.documentValidator);
+        this.addDialog(new NumberPrompt(NUMBER_PROMPT, this.documentValidator));
         this.addDialog(new WaterfallDialog(USER_AUTH, [
             this.initialStep.bind(this),
             this.secondStep.bind(this),
@@ -73,8 +73,10 @@ class AuthUser extends ComponentDialog {
         return stepContext.cancelAllDialogs({ cancelParents: true });
     }
 
-    async documentValidator() {
-        if (cpf.isValid(document) || cnpj.isValid(document)) {
+    async documentValidator(stepContext) {
+        const cpfValido = await cpf.isValid(stepContext.recognized.value.toString());
+        const cnpjValido = await cnpj.isValid(stepContext.recognized.value.toString());
+        if (cpfValido || cnpjValido) {
             return true;
         } else {
             return false;

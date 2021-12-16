@@ -54,9 +54,11 @@ class MainDialog extends ComponentDialog {
             await stepContext.context.sendActivity(messageText, null, InputHints.IgnoringInput);
             return stepContext.next();
         }
+
         if (!userData.welcomedUserProperty) {
             await stepContext.context.sendActivity(msgs.welcomeMessages.welcomeMessage);
-            await this.welcomedUserProperty.set(stepContext.context, true);
+            userData.welcomedUserProperty = true;
+            await this.welcomedUserProperty.set(stepContext.context, userData);
             await this.userState.saveChanges(stepContext.context);
             return stepContext.beginDialog(AUTH_USER);
         } else {

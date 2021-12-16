@@ -1,7 +1,7 @@
 class TicketService {
     addTicket(usuario) {
         const date = new Date();
-        const mes = date.getMonth() + 1;
+        const mes = date.getMonth();
         const res = date.getDate() + 2;
         const ticketData = date.getFullYear().toString() + mes.toString() + date.getDate().toString();
         const ticketRes = date.getFullYear().toString() + mes.toString() + res.toString();

@@ -1,3 +1,4 @@
+const { format } = require('date-fns');
 const messagesFluxo = {
     ticketAberto: 'Vi aqui que você já tem um chamado aberto para alterar a forma ou o prazo de pagamento dos seus pedidos:    ',
     chamado: 'Número de protocolo do chamado :',
@@ -30,19 +31,16 @@ const messagesFluxo = {
     Mas antes preciso confirmar uma informação: `
 };
 function msgTicket(userData) {
-    const msg = (messagesFluxo.chamado + userData.ticketData.toString() + ' - ' +
-    messagesFluxo.tipo + userData.ticketType + ' - ' +
-    messagesFluxo.status + userData.ticketStat + ' - ' +
-    messagesFluxo.criadoEm + dataConverter(userData.ticketData) + ' - ' +
-    messagesFluxo.resolu + dataConverter(userData.ticketRes));
+    const msg = (` ${ messagesFluxo.chamado } ${ userData.ticketData.toString() }   
+    ${ messagesFluxo.tipo } ${ userData.ticketType } 
+    ${ messagesFluxo.status } ${ userData.ticketStat }     
+    ${ messagesFluxo.criadoEm } ${ dataConverter(userData.ticketData) }
+    ${ messagesFluxo.resolu } ${ dataConverter(userData.ticketRes) }`);
     return msg;
 }
 function dataConverter(data) {
     const dataString = data.toString();
-    const ano = dataString.substring(0, 4);
-    const mes = dataString.substring(4, 6);
-    const dia = dataString.substring(6);
-    return (dia + '/' + mes + '/' + ano);
+    return (format(new Date(dataString.substring(0, 4), dataString.substring(4, 6), dataString.substring(6)), 'dd-MM-yyyy'));
 }
 module.exports = {
     messagesFluxo,

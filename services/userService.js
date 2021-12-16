@@ -2,28 +2,28 @@ class UserService {
     constructor() {
         this.listaUsuarios = [
             new User(
-                '91470841207',
-                20211207,
+                '05172654003',
+                20211107,
                 1,
                 'Alteração de Dados',
                 'Em Andamento',
-                20211209),
+                20211109),
             new User(
-                '50254463843',
-                20211205,
+                '25405268020',
+                20211105,
                 2,
                 'Alteração de Dados',
                 'Em Andamento',
-                20211207
+                20211107
             ),
             new User(
-                '40865444153'
+                '07372340403'
             )
         ];
     }
-    // nao funcionando e não sei pq
 
     getUser(document) {
+        // for removido, find usado
         const elemento = this.listaUsuarios.find(elem => {
             return elem.documento === document.toString();
         });

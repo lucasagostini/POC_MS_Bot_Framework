@@ -1,8 +1,8 @@
 
 const messagesInicial = {
     qualIntent: `Como posso te ajudar? 
-    1 - Mudar forma de pagamento 
-    2 - Consultar o status de um chamado`,
+1 - Mudar forma de pagamento 
+2 - Consultar o status de um chamado`,
     informaDoc: 'Por favor, me informe o número do CNPJ ou do CPF que está no seu cadastro.',
     encontrei: 'Pronto, encontrei seu cadastro 😉',
     naoEncontrei: 'Não encontrei seu cadastro 😕',
